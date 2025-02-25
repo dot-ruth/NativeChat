@@ -15,16 +15,11 @@ class _UserInputState extends State<UserInput> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.78,
       margin: EdgeInsets.only(
-        left: 15.0,
+        left: 5.0,
       ),
       padding: EdgeInsets.symmetric(
         horizontal: 8.0,
       ),
-      // decoration: BoxDecoration(
-      //   border: Border.all(
-      //     color: Colors.grey[800]!,
-      //   ),
-      // ),
       child: Text(
         widget.text,
         style: TextStyle(

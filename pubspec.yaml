@@ -41,6 +41,11 @@ dependencies:
     google_generative_ai: ^0.4.6
     flutter_sms_inbox: ^1.0.3
     battery_plus: ^6.2.1
+    gpt_markdown: ^1.0.9
+    call_log_new: ^1.0.5
+    installed_apps: ^1.5.2
+    system_info2: ^4.0.0
+    # device_information: ^0.0.4
     # call_log: ^4.0.0
 
 dev_dependencies:

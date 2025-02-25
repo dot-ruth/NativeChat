@@ -1,5 +1,7 @@
 import "package:flutter/material.dart";
+import "package:gpt_markdown/gpt_markdown.dart";
 import "package:ionicons/ionicons.dart";
+import "package:nativechat/components/codeblock.dart";
 import "package:nativechat/components/dashed_border_exracted.dart";
 
 class AIResponse extends StatefulWidget {
@@ -19,12 +21,12 @@ class _AIResponseState extends State<AIResponse> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: MediaQuery.of(context).size.width * 0.85,
+          width: MediaQuery.of(context).size.width * 0.9,
           margin: EdgeInsets.only(
-            left: 40.0,
+            left: 25.0,
           ),
           padding: EdgeInsets.only(
-            top: 10.0,
+            top: 14.0,
             bottom: 25.0,
           ),
           decoration: BoxDecoration(
@@ -32,27 +34,19 @@ class _AIResponseState extends State<AIResponse> {
           ),
           child: Container(
             margin: EdgeInsets.only(
-              left: 12.0,
+              left: 6.0,
             ),
             padding: EdgeInsets.symmetric(
               horizontal: 8.0,
               // vertical: 5.0,
             ),
-            // decoration: BoxDecoration(
-            //   border: Border.all(
-            //     color: Colors.grey[800]!,
-            //   ),
-            // ),
-            // decoration: BoxDecoration(
-            //   border: Border.all(
-            //     color: Colors.grey[800]!,
-            //   ),
-            // ),
-            child: Text(
+            child: GptMarkdown(
               widget.text,
               style: TextStyle(
                 color: Colors.grey[500],
               ),
+              codeBuilder: (context, name, code, closed) =>
+                  Codeblock(code: code, name: name),
             ),
           ),
         ),
@@ -60,7 +54,7 @@ class _AIResponseState extends State<AIResponse> {
             ? Container(
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.only(
-                  left: 31.0,
+                  left: 16.0,
                 ),
                 child: Icon(
                   Ionicons.ellipse,
