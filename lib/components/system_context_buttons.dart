@@ -26,7 +26,8 @@ class _SystemContextButtonsState extends State<SystemContextButtons> {
       },
       child: Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+        padding: EdgeInsets.symmetric(
+            horizontal: (widget.state ? 15.0 : 10.0), vertical: 8.0),
         decoration: BoxDecoration(
           color: Color(0xff151515),
           border: Border.all(
@@ -35,20 +36,22 @@ class _SystemContextButtonsState extends State<SystemContextButtons> {
           borderRadius: BorderRadius.circular(100.0),
         ),
         child: Row(
-          spacing: 2.0,
+          spacing: widget.state ? 6.0 : 0.0,
           children: [
             Icon(
               widget.icon,
               color: widget.state ? Colors.greenAccent : Colors.grey[600],
               size: 20.0,
             ),
-            SizedBox(height: 5.0),
-            Text(
-              widget.label,
-              style: TextStyle(
-                color: widget.state ? Colors.greenAccent : Colors.grey[600],
-              ),
-            ),
+            widget.state
+                ? Text(
+                    widget.state ? widget.label : '',
+                    style: TextStyle(
+                      color:
+                          widget.state ? Colors.greenAccent : Colors.grey[600],
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),

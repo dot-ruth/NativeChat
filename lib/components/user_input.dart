@@ -13,7 +13,7 @@ class _UserInputState extends State<UserInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.78,
+      width: MediaQuery.of(context).size.width * 0.9,
       margin: EdgeInsets.only(
         left: 5.0,
       ),

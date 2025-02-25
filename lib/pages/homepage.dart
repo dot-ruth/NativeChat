@@ -1,13 +1,18 @@
+import 'dart:async';
+
 import 'package:call_log_new/call_log_new.dart';
 // import 'package:device_information/device_information.dart';
 import 'package:flutter/material.dart';
 import 'package:battery_plus/battery_plus.dart';
+import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
+import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:nativechat/components/dashed_border_exracted.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:system_info2/system_info2.dart';
 // import 'package:system_info_plus/system_info_plus.dart';
@@ -64,7 +69,9 @@ class _HomepageState extends State<Homepage> {
         'THIS IS THE CONTEXT IN WHICH YOU ARE IN, USE THESE INFORMATION TO IMPROVE ON YOUR ANSWERS. YOU MAY HAVE ACCESS TO CALL LOGS, MESSAGES, CURRENT TIME AND DATE AND BATTERY STATUS AND LEVEL. ONLY USE THIS INFORMATION TO IMPROVE YOUR ANSWERS. AND YOU CAN DISCLOSE ANY OF THIS INFORMATION TO THE USER WHEN ASKED.';
 
     if (areCallsInContext == true) {
+      await Permission.phone.request();
       await Permission.contacts.request();
+      // ask for call log permissions
 
       // Iterable<CallLogEntry> callLogs = await CallLog.get();
       final callLogs = await CallLog.fetchCallLogs();
@@ -188,6 +195,53 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  void summarizeText({fromUserInput = false}) async {
+    final model = GenerativeModel(
+      model: 'gemini-2.0-flash',
+      apiKey: 'AIzaSyAnYR1BsRBqpCOk2taz51wwROcOF69L8oU',
+      generationConfig: GenerationConfig(
+        temperature: 1,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 8192,
+        responseMimeType: 'text/plain',
+      ),
+      systemInstruction: Content(
+        'ai',
+        [TextPart('Summarize the texts given to you as short as possible.')],
+      ),
+    );
+    var userInput = '';
+
+    // Input from user
+    if (fromUserInput == true &&
+        userMessageController.text.trim().isEmpty == false) {
+      userInput = userMessageController.text.trim();
+      userMessageController.clear();
+      awaitingResponse(userInput, false);
+      final chat = model.startChat(history: []);
+      final content = Content.text(userInput);
+      final response = await chat.sendMessage(content);
+      awaitingResponse(response.text, true);
+      animateChatHistoryToBottom();
+    } else if (sharedList != null &&
+        sharedList!.isNotEmpty &&
+        sharedList![0].value != null) {
+      // Shared from another app
+      var sharedString = '';
+      for (var eachSharedContent in sharedList!) {
+        sharedString += '${eachSharedContent.value!} ';
+      }
+      userInput = sharedString;
+      awaitingResponse(userInput, false);
+      final chat = model.startChat(history: []);
+      final content = Content.text(userInput);
+      final response = await chat.sendMessage(content);
+      awaitingResponse(response.text, true);
+      animateChatHistoryToBottom();
+    }
+  }
+
   void animateChatHistoryToBottom() {
     scrollController.animateTo(
       scrollController.position.extentTotal,
@@ -224,6 +278,7 @@ class _HomepageState extends State<Homepage> {
   bool areCallsInContext = false;
   bool isBatteryInContext = false;
   bool isDeviceInContext = false;
+  bool isSummarizeInContext = false;
 
   void toggleCallsContext() {
     setState(() {
@@ -249,10 +304,119 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
+  void toggleSummarizeContext() {
+    setState(() {
+      isSummarizeInContext = !isSummarizeInContext;
+    });
+  }
+
+  var promptSuggestions = [];
+
+  void promptSuggestionBuilder() {
+    promptSuggestions = [
+      {
+        'context': "areCallsInContext",
+        'prompt': 'Who called me the most?',
+      },
+      {
+        'context': "areMessagesInContext",
+        'prompt': 'Tell me my unread text messages?',
+      },
+      {
+        'context': "isDeviceInContext",
+        'prompt': 'How many cores does my phone have?',
+      },
+      {
+        'context': "areCallsInContext",
+        'prompt': 'What is the longest call I had?',
+      },
+      {
+        'context': "areMessagesInContext",
+        'prompt': 'What is the last bank transaction amount I made?',
+      },
+      {
+        'context': "isDeviceInContext",
+        'prompt': 'Is my phone charging?',
+      },
+      {
+        'context': "areCallsInContext",
+        'prompt': 'Do I have any recent missed calls?',
+      },
+      {
+        'context': "areMessagesInContext",
+        'prompt': 'What is the sweetest text I got recently?',
+      },
+      {
+        'context': "isDeviceInContext",
+        'prompt': 'How many apps do I have?',
+      },
+    ];
+  }
+
+  void enterPromptSuggestion(promptObject) {
+    if (promptObject["context"] == "areCallsInContext") {
+      setState(() {
+        areCallsInContext = true;
+        areMessagesInContext = false;
+        isDeviceInContext = false;
+      });
+    } else if (promptObject["context"] == "areMessagesInContext") {
+      setState(() {
+        areMessagesInContext = true;
+        areCallsInContext = false;
+        isDeviceInContext = false;
+      });
+    } else if (promptObject["context"] == "isDeviceInContext") {
+      setState(() {
+        isDeviceInContext = true;
+        areCallsInContext = false;
+        areMessagesInContext = false;
+      });
+    }
+    setState(() {
+      userMessageController.text = promptObject["prompt"];
+    });
+    ["prompt"];
+    chatWithAI();
+  }
+
+  late StreamSubscription _intentDataStreamSubscription;
+  List<SharedFile>? sharedList;
   @override
   void initState() {
     super.initState();
     chatHistory = [];
+    promptSuggestionBuilder();
+
+    // For sharing images coming from outside the app while the app is in the memory
+    _intentDataStreamSubscription = FlutterSharingIntent.instance
+        .getMediaStream()
+        .listen((List<SharedFile> value) {
+      setState(() {
+        sharedList = value;
+        summarizeText();
+      });
+      // print("Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
+    }, onError: (err) {});
+
+    // For sharing images coming from outside the app while the app is closed
+    FlutterSharingIntent.instance
+        .getInitialSharing()
+        .then((List<SharedFile> value) {
+      // print("Shared: getInitialMedia ${value.map((f) => f.value).join(",")}");
+      setState(() {
+        sharedList = value;
+        summarizeText();
+      });
+    });
+
+    _intentDataStreamSubscription.onDone(() => summarizeText());
+  }
+
+  @override
+  void dispose() {
+    _intentDataStreamSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -267,6 +431,10 @@ class _HomepageState extends State<Homepage> {
             onPressed: () {
               setState(() {
                 chatHistory = [];
+                areCallsInContext = false;
+                areMessagesInContext = false;
+                isDeviceInContext = false;
+                isSummarizeInContext = false;
               });
             },
             icon: Icon(
@@ -282,15 +450,68 @@ class _HomepageState extends State<Homepage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             SizedBox(height: 20.0),
+            // Text(
+            //   'Sharing data: \n${sharedList}\n',
+            //   style: TextStyle(
+            //     color: Colors.white,
+            //   ),
+            // ),
             // Spacer(),
+            // Icon(
+            //             Ionicons.ellipse,
+            //             size: 18.0,
+            //             color: Colors.grey[900],
+            //           ),
+
             chatHistory.isEmpty
-                ? Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(left: 31.0),
-                    child: Icon(
-                      Ionicons.ellipse,
-                      size: 18.0,
-                      color: Colors.grey[900],
+                ? Expanded(
+                    child: Container(
+                      alignment: Alignment.topLeft,
+                      padding: const EdgeInsets.only(left: 13.0),
+                      child: ListView.builder(
+                        itemCount: promptSuggestions.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              enterPromptSuggestion(promptSuggestions[index]);
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  promptSuggestions[index]["prompt"],
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                Container(
+                                  height: 25.0,
+                                  margin: const EdgeInsets.only(left: 12.0),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      left:
+                                          BorderSide(color: Colors.grey[900]!),
+                                    ),
+                                  ),
+                                ),
+                                index == promptSuggestions.length - 1
+                                    ? Container(
+                                        alignment: Alignment.centerLeft,
+                                        padding: const EdgeInsets.only(
+                                          left: 4.0,
+                                        ),
+                                        child: Icon(
+                                          Ionicons.ellipse,
+                                          size: 18.0,
+                                          color: Colors.grey[900],
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   )
                 : Expanded(
@@ -344,6 +565,7 @@ class _HomepageState extends State<Homepage> {
               padding: const EdgeInsets.only(left: 10.0, bottom: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 20.0),
                   SingleChildScrollView(
@@ -352,6 +574,7 @@ class _HomepageState extends State<Homepage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       spacing: 6.0,
                       children: [
+                        SizedBox(width: 5.0),
                         SystemContextButtons(
                           state: areCallsInContext,
                           icon: Ionicons.call_outline,
@@ -371,10 +594,10 @@ class _HomepageState extends State<Homepage> {
                           toggleState: toggleDeviceContext,
                         ),
                         SystemContextButtons(
-                          state: isBatteryInContext,
-                          icon: Ionicons.battery_half_outline,
-                          label: 'Battery',
-                          toggleState: toggleBatteryContext,
+                          state: isSummarizeInContext,
+                          icon: Ionicons.pencil_outline,
+                          label: 'Summarize',
+                          toggleState: toggleSummarizeContext,
                         ),
                       ],
                     ),
@@ -410,7 +633,9 @@ class _HomepageState extends State<Homepage> {
                         padding: const EdgeInsets.only(right: 8.0),
                         child: IconButton(
                           onPressed: () {
-                            chatWithAI();
+                            isSummarizeInContext == true
+                                ? summarizeText(fromUserInput: true)
+                                : chatWithAI();
                           },
                           icon: Icon(
                             Ionicons.paper_plane_outline,

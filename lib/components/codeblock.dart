@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ionicons/ionicons.dart';
 
 class Codeblock extends StatefulWidget {
   const Codeblock({super.key, required this.code, required this.name});
@@ -13,6 +14,7 @@ class Codeblock extends StatefulWidget {
 
 class _CodeblockState extends State<Codeblock> {
   var _copied = false;
+  var _collapse = false;
 
   void copyToClipboard() async {
     await Clipboard.setData(ClipboardData(text: widget.code)).then((value) {
@@ -53,6 +55,7 @@ class _CodeblockState extends State<Codeblock> {
                 bottom: 6.0,
               ),
               child: Row(
+                spacing: 8.0,
                 children: [
                   Text(
                     widget.name,
@@ -69,6 +72,19 @@ class _CodeblockState extends State<Codeblock> {
                       color: (_copied) ? Colors.greenAccent : Colors.grey[500],
                     ),
                   ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _collapse = !_collapse;
+                      });
+                    },
+                    child: Icon(
+                      Icons.arrow_upward_outlined,
+                      size: 15,
+                      color:
+                          (_collapse) ? Colors.greenAccent : Colors.grey[500],
+                    ),
+                  )
                 ],
               ),
             ),
@@ -83,6 +99,7 @@ class _CodeblockState extends State<Codeblock> {
               padding: const EdgeInsets.all(10),
               child: Text(
                 widget.code,
+                maxLines: _collapse ? 5 : null,
                 style: TextStyle(
                   color: Colors.grey[500],
                 ),
