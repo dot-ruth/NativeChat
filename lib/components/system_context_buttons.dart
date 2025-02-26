@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SystemContextButtons extends StatefulWidget {
-  const SystemContextButtons(
-      {super.key,
-      required this.state,
-      required this.icon,
-      required this.label,
-      required this.toggleState});
+  const SystemContextButtons({
+    super.key,
+    required this.state,
+    required this.icon,
+    required this.label,
+    required this.toggleState,
+  });
 
   final bool state;
   final IconData icon;
@@ -27,7 +28,9 @@ class _SystemContextButtonsState extends State<SystemContextButtons> {
       child: Container(
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(
-            horizontal: (widget.state ? 15.0 : 10.0), vertical: 8.0),
+          horizontal: 10.0,
+          vertical: 8.0,
+        ),
         decoration: BoxDecoration(
           color: Color(0xff151515),
           border: Border.all(
@@ -40,15 +43,18 @@ class _SystemContextButtonsState extends State<SystemContextButtons> {
           children: [
             Icon(
               widget.icon,
-              color: widget.state ? Colors.greenAccent : Colors.grey[600],
+              color: widget.state
+                  ? Colors.greenAccent
+                  : Theme.of(context).iconTheme.color,
               size: 20.0,
             ),
             widget.state
                 ? Text(
                     widget.state ? widget.label : '',
                     style: TextStyle(
-                      color:
-                          widget.state ? Colors.greenAccent : Colors.grey[600],
+                      color: widget.state
+                          ? Colors.greenAccent
+                          : Theme.of(context).iconTheme.color,
                     ),
                   )
                 : Container(),

@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:call_log_new/call_log_new.dart';
-// import 'package:device_information/device_information.dart';
 import 'package:flutter/material.dart';
+import 'package:call_log_new/call_log_new.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
@@ -11,16 +10,12 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:nativechat/components/dashed_border_exracted.dart';
+import 'package:nativechat/components/context_toggle_row.dart';
+import 'package:nativechat/components/conversation_feed.dart';
+import 'package:nativechat/components/input_box_and_send_button.dart';
+import 'package:nativechat/components/prompt_suggestions.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:system_info2/system_info2.dart';
-// import 'package:system_info_plus/system_info_plus.dart';
-
-import '../components/ai_response.dart';
-import '../components/system_context_buttons.dart';
-import '../components/user_input.dart';
-// import 'package:call_log/call_log.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -35,31 +30,7 @@ class _HomepageState extends State<Homepage> {
   var callsLimit = 100;
   var smsLimit = 100;
 
-  var chatHistory = [
-    {"from": "user", "content": "Hey there!", "timestamp": "12:34"},
-    {
-      "from": "ai",
-      "content": "Hey there! How can I help you today?",
-      "timestamp": "12:35",
-    },
-    {"from": "user", "content": "Yes, What is the time?", "timestamp": "12:34"},
-    {
-      "from": "ai",
-      "content": "You're in luck cause I know the time",
-      "timestamp": "12:35",
-    },
-    {
-      "from": "user",
-      "content": "Summarize, my last text message",
-      "timestamp": "12:34",
-    },
-    {
-      "from": "ai",
-      "content":
-          "You're in luck cause I know the time. You're in luck cause I know the time. You're in luck cause I know the time. You're in luck cause I know the time. You're in luck cause I know the time. You're in luck cause I know the time. You're in luck cause I know the time.",
-      "timestamp": "12:35",
-    },
-  ];
+  var chatHistory = [];
 
   var installedAppsString = '';
   var installedAppsLength = 0;
@@ -280,27 +251,33 @@ class _HomepageState extends State<Homepage> {
   bool isDeviceInContext = false;
   bool isSummarizeInContext = false;
 
-  void toggleCallsContext() {
+  void toggleCallsContext({value}) {
     setState(() {
-      areCallsInContext = !areCallsInContext;
+      if (value != null) {
+        areCallsInContext = value;
+      } else {
+        areCallsInContext = !areCallsInContext;
+      }
     });
   }
 
-  void toggleMessageContext() {
+  void toggleMessageContext({value}) {
     setState(() {
-      areMessagesInContext = !areMessagesInContext;
+      if (value != null) {
+        areMessagesInContext = value;
+      } else {
+        areMessagesInContext = !areMessagesInContext;
+      }
     });
   }
 
-  void toggleBatteryContext() {
+  void toggleDeviceContext({value}) {
     setState(() {
-      isBatteryInContext = !isBatteryInContext;
-    });
-  }
-
-  void toggleDeviceContext() {
-    setState(() {
-      isDeviceInContext = !isDeviceInContext;
+      if (value != null) {
+        isDeviceInContext = value;
+      } else {
+        isDeviceInContext = !isDeviceInContext;
+      }
     });
   }
 
@@ -310,83 +287,12 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  var promptSuggestions = [];
-
-  void promptSuggestionBuilder() {
-    promptSuggestions = [
-      {
-        'context': "areCallsInContext",
-        'prompt': 'Who called me the most?',
-      },
-      {
-        'context': "areMessagesInContext",
-        'prompt': 'Tell me my unread text messages?',
-      },
-      {
-        'context': "isDeviceInContext",
-        'prompt': 'How many cores does my phone have?',
-      },
-      {
-        'context': "areCallsInContext",
-        'prompt': 'What is the longest call I had?',
-      },
-      {
-        'context': "areMessagesInContext",
-        'prompt': 'What is the last bank transaction amount I made?',
-      },
-      {
-        'context': "isDeviceInContext",
-        'prompt': 'Is my phone charging?',
-      },
-      {
-        'context': "areCallsInContext",
-        'prompt': 'Do I have any recent missed calls?',
-      },
-      {
-        'context': "areMessagesInContext",
-        'prompt': 'What is the sweetest text I got recently?',
-      },
-      {
-        'context': "isDeviceInContext",
-        'prompt': 'How many apps do I have?',
-      },
-    ];
-  }
-
-  void enterPromptSuggestion(promptObject) {
-    if (promptObject["context"] == "areCallsInContext") {
-      setState(() {
-        areCallsInContext = true;
-        areMessagesInContext = false;
-        isDeviceInContext = false;
-      });
-    } else if (promptObject["context"] == "areMessagesInContext") {
-      setState(() {
-        areMessagesInContext = true;
-        areCallsInContext = false;
-        isDeviceInContext = false;
-      });
-    } else if (promptObject["context"] == "isDeviceInContext") {
-      setState(() {
-        isDeviceInContext = true;
-        areCallsInContext = false;
-        areMessagesInContext = false;
-      });
-    }
-    setState(() {
-      userMessageController.text = promptObject["prompt"];
-    });
-    ["prompt"];
-    chatWithAI();
-  }
-
   late StreamSubscription _intentDataStreamSubscription;
   List<SharedFile>? sharedList;
   @override
   void initState() {
     super.initState();
     chatHistory = [];
-    promptSuggestionBuilder();
 
     // For sharing images coming from outside the app while the app is in the memory
     _intentDataStreamSubscription = FlutterSharingIntent.instance
@@ -425,7 +331,6 @@ class _HomepageState extends State<Homepage> {
       backgroundColor: Color(0xff0f0f0f),
       appBar: AppBar(
         backgroundColor: Color(0xff0f0f0f),
-        // title: Text(now.toString()),
         actions: [
           IconButton(
             onPressed: () {
@@ -440,6 +345,7 @@ class _HomepageState extends State<Homepage> {
             icon: Icon(
               Ionicons.trash_sharp,
               size: 18.0,
+              color: Theme.of(context).iconTheme.color,
             ),
           ),
         ],
@@ -449,201 +355,42 @@ class _HomepageState extends State<Homepage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            SizedBox(height: 20.0),
-            // Text(
-            //   'Sharing data: \n${sharedList}\n',
-            //   style: TextStyle(
-            //     color: Colors.white,
-            //   ),
-            // ),
-            // Spacer(),
-            // Icon(
-            //             Ionicons.ellipse,
-            //             size: 18.0,
-            //             color: Colors.grey[900],
-            //           ),
-
             chatHistory.isEmpty
-                ? Expanded(
-                    child: Container(
-                      alignment: Alignment.topLeft,
-                      padding: const EdgeInsets.only(left: 13.0),
-                      child: ListView.builder(
-                        itemCount: promptSuggestions.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              enterPromptSuggestion(promptSuggestions[index]);
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  promptSuggestions[index]["prompt"],
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                Container(
-                                  height: 25.0,
-                                  margin: const EdgeInsets.only(left: 12.0),
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      left:
-                                          BorderSide(color: Colors.grey[900]!),
-                                    ),
-                                  ),
-                                ),
-                                index == promptSuggestions.length - 1
-                                    ? Container(
-                                        alignment: Alignment.centerLeft,
-                                        padding: const EdgeInsets.only(
-                                          left: 4.0,
-                                        ),
-                                        child: Icon(
-                                          Ionicons.ellipse,
-                                          size: 18.0,
-                                          color: Colors.grey[900],
-                                        ),
-                                      )
-                                    : Container(),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                ? PromptSuggestionsFeed(
+                    chatWithAI: chatWithAI,
+                    toggleCallsContext: toggleCallsContext,
+                    toggleMessageContext: toggleMessageContext,
+                    toggleDeviceContext: toggleDeviceContext,
+                    userMessageController: userMessageController,
                   )
-                : Expanded(
-                    flex: 3,
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemCount: chatHistory.length,
-                      itemBuilder: (context, index) {
-                        // final item = chatHistory[index];
-                        final bool isUser =
-                            chatHistory[index]['from'] == "user";
-                        final bool isSystem =
-                            chatHistory[index]['from'] == "system";
-                        final bool isLast = index == chatHistory.length - 1;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              // mainAxisAlignment: item['from'] == "user"
-                              //     ? MainAxisAlignment.end
-                              //     : MainAxisAlignment.start,
-                              children: [
-                                isSystem
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(left: 18.0),
-                                        child: LoadingAnimationWidget.beat(
-                                          color: Colors.grey[600]!,
-                                          size: 14,
-                                        ),
-                                      )
-                                    : isUser
-                                        ? UserInput(
-                                            text: chatHistory[index]
-                                                ['content']!,
-                                          )
-                                        : AIResponse(
-                                            text: chatHistory[index]
-                                                ['content']!,
-                                            isLast: isLast,
-                                          ),
-                              ],
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                : ConversationFeed(
+                    scrollController: scrollController,
+                    chatHistory: chatHistory,
                   ),
             Padding(
-              padding: const EdgeInsets.only(left: 10.0, bottom: 10.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10.0,
+                vertical: 10.0,
+              ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                spacing: 10.0,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20.0),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      spacing: 6.0,
-                      children: [
-                        SizedBox(width: 5.0),
-                        SystemContextButtons(
-                          state: areCallsInContext,
-                          icon: Ionicons.call_outline,
-                          label: 'Calls',
-                          toggleState: toggleCallsContext,
-                        ),
-                        SystemContextButtons(
-                          state: areMessagesInContext,
-                          icon: Ionicons.mail_outline,
-                          label: 'Messages',
-                          toggleState: toggleMessageContext,
-                        ),
-                        SystemContextButtons(
-                          state: isDeviceInContext,
-                          icon: Ionicons.hardware_chip_outline,
-                          label: 'Device',
-                          toggleState: toggleDeviceContext,
-                        ),
-                        SystemContextButtons(
-                          state: isSummarizeInContext,
-                          icon: Ionicons.pencil_outline,
-                          label: 'Summarize',
-                          toggleState: toggleSummarizeContext,
-                        ),
-                      ],
-                    ),
+                  ContextToggleRow(
+                    areCallsInContext: areCallsInContext,
+                    areMessagesInContext: areMessagesInContext,
+                    isDeviceInContext: isDeviceInContext,
+                    isSummarizeInContext: isSummarizeInContext,
+                    toggleCallsContext: toggleCallsContext,
+                    toggleMessageContext: toggleMessageContext,
+                    toggleDeviceContext: toggleDeviceContext,
+                    toggleSummarizeContext: toggleSummarizeContext,
                   ),
-                  SizedBox(height: 10.0),
-                  Row(
-                    children: [
-                      // InputBox
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                            left: 18.0,
-                            right: 18.0,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30.0),
-                            color: Color(0xff151515),
-                          ),
-                          child: TextField(
-                            controller: userMessageController,
-                            cursorColor: Colors.white,
-                            style: TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText: "ask about anything...",
-                              hintStyle: TextStyle(color: Colors.grey[700]),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Send Button
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: IconButton(
-                          onPressed: () {
-                            isSummarizeInContext == true
-                                ? summarizeText(fromUserInput: true)
-                                : chatWithAI();
-                          },
-                          icon: Icon(
-                            Ionicons.paper_plane_outline,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ),
-                    ],
+                  InputBoxAndSendButton(
+                    summarizeText: summarizeText,
+                    chatWithAI: chatWithAI,
+                    isSummarizeInContext: isSummarizeInContext,
+                    userMessageController: userMessageController,
                   ),
                 ],
               ),

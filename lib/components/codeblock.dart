@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ionicons/ionicons.dart';
 
 class Codeblock extends StatefulWidget {
   const Codeblock({super.key, required this.code, required this.name});
@@ -30,83 +29,81 @@ class _CodeblockState extends State<Codeblock> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: 10.0),
-      child: Material(
-        color: Color(0xff171717),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Name and Copy Button
-            Container(
-              decoration: BoxDecoration(
-                color: Color(0xff151515),
-                borderRadius: BorderRadius.circular(
-                  10.0,
+    return Material(
+      color: Color(0xff171717),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Name and Copy Button
+          Container(
+            decoration: BoxDecoration(
+              color: Color(0xff151515),
+              borderRadius: BorderRadius.circular(
+                10.0,
+              ),
+            ),
+            padding: const EdgeInsets.only(
+              left: 14.0,
+              right: 10.0,
+              top: 6.0,
+              bottom: 6.0,
+            ),
+            child: Row(
+              spacing: 8.0,
+              children: [
+                Text(
+                  widget.name,
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.only(
-                left: 14.0,
-                right: 10.0,
-                top: 6.0,
-                bottom: 6.0,
-              ),
-              child: Row(
-                spacing: 8.0,
-                children: [
-                  Text(
-                    widget.name,
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                    ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: copyToClipboard,
+                  child: Icon(
+                    (_copied) ? Icons.done : Icons.content_paste,
+                    size: 15,
+                    color: (_copied) ? Colors.greenAccent : Colors.grey[500],
                   ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: copyToClipboard,
-                    child: Icon(
-                      (_copied) ? Icons.done : Icons.content_paste,
-                      size: 15,
-                      color: (_copied) ? Colors.greenAccent : Colors.grey[500],
-                    ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _collapse = !_collapse;
+                    });
+                  },
+                  child: Icon(
+                    (_collapse)
+                        ? Icons.arrow_downward_outlined
+                        : Icons.arrow_upward_outlined,
+                    size: 15,
+                    color: (_collapse) ? Colors.greenAccent : Colors.grey[500],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _collapse = !_collapse;
-                      });
-                    },
-                    child: Icon(
-                      Icons.arrow_upward_outlined,
-                      size: 15,
-                      color:
-                          (_collapse) ? Colors.greenAccent : Colors.grey[500],
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-            Divider(
-              height: 1,
-              color: Colors.grey[900]!,
-            ),
+          ),
+          Divider(
+            height: 1,
+            color: Colors.grey[900]!,
+          ),
 
-            // Code
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.all(10),
-              child: Text(
-                widget.code,
-                maxLines: _collapse ? 5 : null,
-                style: TextStyle(
-                  color: Colors.grey[500],
-                ),
+          // Code
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              widget.code,
+              maxLines: _collapse ? 5 : null,
+              style: TextStyle(
+                color: Colors.grey[500],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

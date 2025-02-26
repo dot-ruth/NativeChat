@@ -32,7 +32,16 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       initialRoute: "/",
       routes: {"/": (context) => const Homepage()},
-      theme: ThemeData(scaffoldBackgroundColor: Color(0xff0f0f0f)),
+      theme: ThemeData(
+        scaffoldBackgroundColor: Color(0xff0f0f0f),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xff0f0f0f),
+        ),
+        canvasColor: Color(0xff0f0f0f),
+        iconTheme: IconThemeData(
+          color: Colors.grey[600],
+        ),
+      ),
     );
   }
 }
