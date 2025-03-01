@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   battery_plus
   call_log_new
+  flutter_tts
   permission_handler_windows
 )
 

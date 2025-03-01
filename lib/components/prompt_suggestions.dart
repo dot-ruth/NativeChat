@@ -6,10 +6,12 @@ class PromptSuggestionsFeed extends StatefulWidget {
     super.key,
     required this.chatWithAI,
     required this.userMessageController,
+    required this.isOneSidedChatMode,
   });
 
   final Function chatWithAI;
   final TextEditingController userMessageController;
+  final bool isOneSidedChatMode;
 
   @override
   State<PromptSuggestionsFeed> createState() => _PromptSuggestionsFeedState();
@@ -51,7 +53,9 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
                 enterPromptSuggestion(promptSuggestions[index]);
               },
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: widget.isOneSidedChatMode
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
                 children: [
                   Text(
                     promptSuggestions[index],
@@ -62,23 +66,32 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
                   Container(
                     height: 25.0,
                     margin: const EdgeInsets.only(left: 12.0),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(color: Colors.grey[900]!),
-                      ),
-                    ),
+                    decoration: widget.isOneSidedChatMode
+                        ? BoxDecoration(
+                            border: Border(
+                              left: BorderSide(color: Colors.grey[900]!),
+                            ),
+                          )
+                        : BoxDecoration(),
                   ),
                   index == promptSuggestions.length - 1
-                      ? Container(
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.only(
-                            left: 4.0,
-                          ),
-                          child: Icon(
-                            Ionicons.ellipse,
-                            size: 18.0,
-                            color: Colors.grey[900],
-                          ),
+                      ? Row(
+                          mainAxisAlignment: widget.isOneSidedChatMode
+                              ? MainAxisAlignment.start
+                              : MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.only(
+                                left: 4.0,
+                              ),
+                              child: Icon(
+                                Ionicons.ellipse,
+                                size: 18.0,
+                                color: Colors.grey[900],
+                              ),
+                            ),
+                          ],
                         )
                       : Container(),
                 ],

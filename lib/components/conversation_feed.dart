@@ -9,10 +9,12 @@ class ConversationFeed extends StatefulWidget {
     super.key,
     required this.scrollController,
     required this.chatHistory,
+    required this.isOneSidedChatMode,
   });
 
   final ScrollController scrollController;
   final List<dynamic> chatHistory;
+  final bool isOneSidedChatMode;
 
   @override
   State<ConversationFeed> createState() => _ConversationFeedState();
@@ -35,29 +37,38 @@ class _ConversationFeedState extends State<ConversationFeed> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               isSystem
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SystemResponse(
+                  ? widget.isOneSidedChatMode == false
+                      ? SystemResponse(
                           text: widget.chatHistory[index]['content'].toString(),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(left: 18.0),
-                          child: LoadingAnimationWidget.beat(
-                            color: Colors.grey[600]!,
-                            size: 14,
-                          ),
-                        ),
-                      ],
-                    )
+                          isOneSidedChatMode: widget.isOneSidedChatMode,
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SystemResponse(
+                              text: widget.chatHistory[index]['content']
+                                  .toString(),
+                              isOneSidedChatMode: widget.isOneSidedChatMode,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(left: 18.0),
+                              child: LoadingAnimationWidget.beat(
+                                color: Colors.grey[600]!,
+                                size: 14,
+                              ),
+                            ),
+                          ],
+                        )
                   : isUser
                       ? UserInput(
                           text: widget.chatHistory[index]['content'],
+                          isOneSidedChatMode: widget.isOneSidedChatMode,
                         )
                       : AIResponse(
                           text: widget.chatHistory[index]['content'].toString(),
                           isLast: isLast,
+                          isOneSidedChatMode: widget.isOneSidedChatMode,
                         ),
             ],
           );

@@ -6,15 +6,18 @@ import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:hive/hive.dart';
 import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:nativechat/components/context_toggle_row.dart';
 import 'package:nativechat/components/conversation_feed.dart';
-import 'package:nativechat/components/input_box_and_send_button.dart';
+import 'package:nativechat/components/input_box.dart';
 import 'package:nativechat/components/prompt_suggestions.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:system_info2/system_info2.dart';
 
 class Homepage extends StatefulWidget {
@@ -22,15 +25,6 @@ class Homepage extends StatefulWidget {
 
   @override
   State<Homepage> createState() => _HomepageState();
-}
-
-enum CustomFunctionCalls {
-  getDeviceApps,
-  getDeviceSpecs,
-  getCallLogs,
-  getSMS,
-  getDeviceBattery,
-  clearConversation
 }
 
 class _HomepageState extends State<Homepage> {
@@ -144,52 +138,147 @@ class _HomepageState extends State<Homepage> {
   final functionDeclarations = [
     // SPECS
     FunctionDeclaration(
-      CustomFunctionCalls.getDeviceSpecs.toString(),
-      'Gets all information and dpecs about the device',
+      "getDeviceSpecs",
+      "Gets all system specifications and hardware details about the device.",
       Schema.object(properties: {
-        'all': Schema.string(),
+        'kernelArchitecture': Schema.string(
+            description:
+                "The architecture of the device's kernel (e.g., x86_64, arm64)."),
+        'kernelBitness': Schema.integer(
+            description: "The bitness of the kernel (e.g., 32 or 64)."),
+        'kernelName': Schema.string(
+            description:
+                "The name of the kernel (e.g., Linux, Darwin, Windows)."),
+        'kernelVersion': Schema.string(
+            description: "The version of the kernel installed on the device."),
+        'operatingSystemName': Schema.string(
+            description:
+                "The name of the operating system running on the device."),
+        'operatingSystemVersion': Schema.string(
+            description:
+                "The version of the operating system installed on the device."),
+        'userDirectory': Schema.string(
+            description: "The home directory path of the current user."),
+        'userId': Schema.string(
+            description: "The user ID of the currently logged-in user."),
+        'userName': Schema.string(
+            description: "The username of the currently logged-in user."),
+        'userSpaceBitness': Schema.integer(
+            description: "The bitness of the user space (e.g., 32 or 64)."),
+        'totalPhysicalMemoryMB': Schema.integer(
+            description: "Total amount of physical memory (RAM) in megabytes."),
+        'freePhysicalMemoryMB': Schema.integer(
+            description: "Available physical memory (RAM) in megabytes."),
+        'totalVirtualMemoryMB': Schema.integer(
+            description: "Total virtual memory size in megabytes."),
+        'freeVirtualMemoryMB': Schema.integer(
+            description: "Available virtual memory in megabytes."),
+        'virtualMemorySizeMB': Schema.integer(
+            description: "The size of allocated virtual memory in megabytes."),
+        'numberOfProcessors': Schema.integer(
+            description: "The number of processor cores available."),
+        'coresInfo': Schema.array(
+            items: Schema.string(
+                description: "Details about each processor core.")),
       }),
     ),
 
     // CALL LOGS
     FunctionDeclaration(
-      CustomFunctionCalls.getCallLogs.toString(),
-      'Gets a list call history with details about each message',
+      "getCallLogs",
+      'Gets a list call history with details about each message. Which you can use to do more inference and statistics from.',
       Schema.object(properties: {
-        'all': Schema.string(),
+        'callLogs': Schema.array(
+          items: Schema.object(properties: {
+            'name': Schema.string(
+                description:
+                    "The contact name associated with the call, if available."),
+            'callType': Schema.string(
+                description:
+                    "The type of call: incoming, outgoing, or missed."),
+            'number': Schema.string(
+                description: "The phone number associated with the call."),
+            'cachedNumberLabel': Schema.string(
+                description: "The cached label for the number, if available."),
+            'duration': Schema.integer(
+                description: "The duration of the call in seconds."),
+            'timestamp': Schema.string(
+                description: "The timestamp of the call in ISO 8601 format."),
+            'simDisplayName': Schema.string(
+                description: "The name of the SIM card used for the call."),
+          }),
+        ),
       }),
     ),
 
     // SMS
     FunctionDeclaration(
-      CustomFunctionCalls.getSMS.toString(),
-      "Gets a list of the user's text messages with details. It will also contain bank transactions and more.",
+      "getSMS",
+      "Gets a list of the user's text messages with details, including sender, content, date, and whether the message was read. This list could contain private, work, transactional, bank, ISP, financial and many more information that can be used for further analysis and statistics.",
       Schema.object(properties: {
-        'all': Schema.string(),
+        'messages': Schema.array(
+          items: Schema.object(properties: {
+            'id': Schema.string(
+                description: "A unique identifier for the message."),
+            'from': Schema.string(
+                description: "The sender's phone number or contact name."),
+            'content':
+                Schema.string(description: "The body of the text message."),
+            'date': Schema.string(
+                description:
+                    "The timestamp when the message was sent or received, in ISO 8601 format."),
+            'isRead': Schema.boolean(
+                description:
+                    "Indicates whether the message has been read (true) or not (false)."),
+            'kind': Schema.string(
+                description:
+                    "Specifies if the message was 'Sent' or 'Received'."),
+          }),
+        ),
       }),
     ),
 
     // BATTERY
     FunctionDeclaration(
-      CustomFunctionCalls.getDeviceBattery.toString(),
-      "Gets the user device's battery level in percentage and if it is charging, connectedNotCharging, discharging, full or unknown.",
+      "getDeviceBattery",
+      "Gets the user's device battery level in percentage and its charging state.",
       Schema.object(properties: {
-        'all': Schema.string(),
+        'batteryLevel': Schema.integer(
+            description: "The current battery level as a percentage (0-100)."),
+        'batteryState': Schema.string(
+            description:
+                "The current state of the battery: charging, discharging, full, connectedNotCharging, or unknown."),
       }),
     ),
 
     // APPS
     FunctionDeclaration(
-      CustomFunctionCalls.getDeviceApps.toString(),
-      'Gets a count and list of all installed apps on the device.',
+      "getDeviceApps",
+      "Gets a count and list of all installed apps on the device. Use this function to check if a specific app is installed by searching for it in the returned list.",
       Schema.object(properties: {
-        'all': Schema.string(),
+        'installedApps': Schema.array(
+          items: Schema.object(properties: {
+            'appName': Schema.string(
+                description: "The display name of the installed application."),
+            'packageName': Schema.string(
+                description:
+                    "The unique package identifier of the application."),
+            'versionName': Schema.string(
+                description:
+                    "The human-readable version name of the application."),
+            'versionCode': Schema.integer(
+                description: "The internal version code of the application."),
+            'installedTimestamp': Schema.string(
+                description:
+                    "The timestamp of when the application was installed, in ISO 8601 format."),
+          }),
+        ),
       }),
     ),
 
     // NO CONTEXT
     FunctionDeclaration(
-      CustomFunctionCalls.clearConversation.toString(),
+      "clearConversation",
       'Clears the current conversation history.',
       Schema.object(
         properties: {'clear': Schema.string()},
@@ -312,8 +401,10 @@ class _HomepageState extends State<Homepage> {
       if (response.functionCalls.isNotEmpty) {
         await functionCallHandler(userInput, response.functionCalls);
       } else {
-        gotResponseFromAI(response.text);
-        animateChatHistoryToBottom();
+        if (response.text.toString().trim() != 'null') {
+          gotResponseFromAI(response.text);
+          animateChatHistoryToBottom();
+        }
       }
     }
   }
@@ -328,6 +419,9 @@ class _HomepageState extends State<Homepage> {
   }
 
   void gotResponseFromAI(content) {
+    if (isInVoiceMode) {
+      speak(content);
+    }
     setState(() {
       chatHistory.add({
         "from": "ai",
@@ -337,51 +431,55 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
+  FlutterTts flutterTts = FlutterTts();
+  void speak(message) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setSpeechRate(0.8);
+    await flutterTts.setVolume(1.0);
+    await flutterTts.setPitch(0.7);
+    await flutterTts.speak(message);
+  }
+
   var appFunctions = ['clearConversation'];
   Future<void> functionCallHandler(userInput, functionCalls) async {
     var advancedContext = '';
     for (var eachFunctionCall in functionCalls) {
-      var functionCallName = eachFunctionCall.name;
+      var functionCallName = eachFunctionCall.name.toString().trim();
+
       if (appFunctions.contains(functionCallName)) {
         if (functionCallName == 'clearConversation') {
-          setSystemMessage('clearing conversation...');
           clearConversation();
         }
       } else {
-        if (functionCallName == CustomFunctionCalls.getDeviceSpecs.toString()) {
+        if (functionCallName == "getDeviceSpecs") {
           toggleContext(isDeviceInContext);
           setSystemMessage('getting device specs...');
           final deviceSpecs = await getDeviceSpecs();
           advancedContext += deviceSpecs;
-        } else if (functionCallName ==
-            CustomFunctionCalls.getDeviceApps.toString()) {
+        } else if (functionCallName == "getDeviceApps") {
           toggleContext(areAppsInContext);
           setSystemMessage('getting installed apps...');
           final deviceApps = await getDeviceApps();
           advancedContext += deviceApps;
-        } else if (functionCallName ==
-            CustomFunctionCalls.getCallLogs.toString()) {
+        } else if (functionCallName == "getCallLogs") {
           toggleContext(areCallsInContext);
           setSystemMessage('getting call logs...');
           final callLogs = await getCallLogs();
           advancedContext += callLogs;
-        } else if (functionCallName == CustomFunctionCalls.getSMS.toString()) {
+        } else if (functionCallName == "getSMS") {
           toggleContext(areMessagesInContext);
           setSystemMessage('getting text messages...');
           final sms = await getSMS();
           advancedContext += sms;
-        } else if (functionCallName ==
-            CustomFunctionCalls.getDeviceBattery.toString()) {
+        } else if (functionCallName == "getDeviceBattery") {
           toggleContext(isBatteryInContext);
           setSystemMessage('getting battery level and status...');
-          print("hereb");
           final batteryInfo = await getDeviceBattery();
           advancedContext += batteryInfo;
-          print("$advancedContext");
         }
+        await continueFromFunctionCall(userInput, advancedContext);
       }
     }
-    await continueFromFunctionCall(userInput, advancedContext);
   }
 
   Future<void> continueFromFunctionCall(userInput, context) async {
@@ -482,11 +580,72 @@ class _HomepageState extends State<Homepage> {
   void clearConversation() {
     setState(() {
       chatHistory = [];
-      areCallsInContext = false;
-      areMessagesInContext = false;
-      isDeviceInContext = false;
-      isSummarizeInContext = false;
     });
+  }
+
+  dynamic isOneSidedChatMode = false;
+  void toggleOneSidedChatMode() async {
+    Box settingBox = await Hive.openBox("settings");
+    isOneSidedChatMode = await settingBox.get("isOneSidedChatMode");
+    if (isOneSidedChatMode.toString() == 'null') {
+      await settingBox.put("isOneSidedChatMode", false);
+      isOneSidedChatMode = false;
+    }
+
+    setState(() {
+      isOneSidedChatMode = !isOneSidedChatMode;
+    });
+    await settingBox.put("isOneSidedChatMode", isOneSidedChatMode);
+    Hive.close();
+  }
+
+  void getSettings() async {
+    Box settingBox = await Hive.openBox("settings");
+    isOneSidedChatMode = await settingBox.get("isOneSidedChatMode");
+    if (isOneSidedChatMode.toString() == 'null') {
+      await settingBox.put("isOneSidedChatMode", false);
+      isOneSidedChatMode = false;
+    }
+    Hive.close();
+  }
+
+  final SpeechToText speechToText = SpeechToText();
+  bool speechEnabled = false;
+  String lastWords = '';
+  void initSpeech() async {
+    speechEnabled = await speechToText.initialize();
+    setState(() {});
+  }
+
+  bool isInVoiceMode = false;
+  void toggleVoiceMode() async {
+    setState(() {
+      isInVoiceMode = !isInVoiceMode;
+    });
+    if (isInVoiceMode == false) {
+      await flutterTts.stop();
+    }
+  }
+
+  void startListening() async {
+    await flutterTts.stop();
+    await speechToText.listen(onResult: onSpeechResult);
+    setState(() {});
+  }
+
+  void stopListening() async {
+    await speechToText.stop();
+    setState(() {});
+  }
+
+  void onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      lastWords = result.recognizedWords;
+      userMessageController.text = lastWords;
+    });
+    if (speechToText.isNotListening) {
+      chatWithAI();
+    }
   }
 
   late StreamSubscription _intentDataStreamSubscription;
@@ -495,6 +654,9 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     chatHistory = [];
+    initSpeech();
+    getSettings();
+
     model = GenerativeModel(
       model: 'gemini-2.0-flash',
       apiKey: 'AIzaSyAnYR1BsRBqpCOk2taz51wwROcOF69L8oU',
@@ -508,7 +670,7 @@ class _HomepageState extends State<Homepage> {
       // systemInstruction: Content('ai', [TextPart(advancedContext)]),
       systemInstruction: Content('system', [
         TextPart(
-            "YOU CAN DO AND TALK ABOUT ANYTHING! IF YOU THINK A FUNCTION CALL IS IMPORTANT BUT YOU CAN'T FIND THE FUNCTION IN YOUR CONTEXT YOU CAN SIMPLY TEXT GENERATE A POSSIBLE RESPONSE. YOU CAN ALSO WRITE ANY CODE.")
+            "YOU ARE A HELPFUL ASSISTANT IN THE USER'S PHONE. YOU GET ACCESS TO DIFFERENT INFORMATION BY THE FUNCTION CALLS PROVIDED TO YOU. YOU CAN DO AND TALK ABOUT ANYTHING! ALWAYS USE THE AVAILABLE FUNCTION CALLS FIRST BEFORE TEXT-GENERATING. IF YOU THINK A FUNCTION CALL IS IMPORTANT BUT YOU CAN'T FIND THE FUNCTION IN YOUR CONTEXT YOU CAN SIMPLY TEXT GENERATE A POSSIBLE RESPONSE. YOU CAN ALSO WRITE ANY CODE.")
       ]),
       tools: [
         Tool(
@@ -518,11 +680,6 @@ class _HomepageState extends State<Homepage> {
       toolConfig: ToolConfig(
         functionCallingConfig: FunctionCallingConfig(
           mode: FunctionCallingMode.auto,
-          // Options: 'AUTO', 'ANY', 'NONE'
-          // 'AUTO': The model decides whether to respond with a function call or natural language
-          // 'ANY': The model is constrained to always predict a function call. If allowedFunctionNames is provided, the model picks from the specified functions.
-          // 'NONE': The model won't predict any function calls.
-          // allowedFunctionNames: ['controlLight'], // Specify if mode is 'ANY'
         ),
       ),
     );
@@ -564,7 +721,19 @@ class _HomepageState extends State<Homepage> {
       backgroundColor: Color(0xff0f0f0f),
       appBar: AppBar(
         backgroundColor: Color(0xff0f0f0f),
+        leading: // Change chat layout
+            IconButton(
+          onPressed: () async {
+            toggleOneSidedChatMode();
+          },
+          icon: Icon(
+            isOneSidedChatMode == true
+                ? Icons.align_horizontal_right_outlined
+                : Icons.align_horizontal_left_outlined,
+          ),
+        ),
         actions: [
+          // Clear Chat
           IconButton(
             onPressed: () {
               clearConversation();
@@ -586,10 +755,12 @@ class _HomepageState extends State<Homepage> {
                 ? PromptSuggestionsFeed(
                     chatWithAI: chatWithAI,
                     userMessageController: userMessageController,
+                    isOneSidedChatMode: isOneSidedChatMode,
                   )
                 : ConversationFeed(
                     scrollController: scrollController,
                     chatHistory: chatHistory,
+                    isOneSidedChatMode: isOneSidedChatMode,
                   ),
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -600,20 +771,16 @@ class _HomepageState extends State<Homepage> {
                 spacing: 10.0,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ContextToggleRow(
-                  //   areCallsInContext: areCallsInContext,
-                  //   areMessagesInContext: areMessagesInContext,
-                  //   isDeviceInContext: isDeviceInContext,
-                  //   areAppsInContext: areAppsInContext,
-                  //   isBatteryInContext: isBatteryInContext,
-                  //   isSummarizeInContext: isSummarizeInContext,
-                  //   toggleContext: toggleContext,
-                  // ),
                   InputBoxAndSendButton(
                     summarizeText: summarizeText,
                     chatWithAI: chatWithAI,
                     isSummarizeInContext: isSummarizeInContext,
                     userMessageController: userMessageController,
+                    startListening: startListening,
+                    stopListening: stopListening,
+                    speechToText: speechToText,
+                    toggleVoiceMode: toggleVoiceMode,
+                    isInVoiceMode: isInVoiceMode,
                   ),
                 ],
               ),

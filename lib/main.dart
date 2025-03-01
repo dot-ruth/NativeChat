@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:nativechat/models/settings.dart';
 
 import 'pages/homepage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(SettingsAdapter());
+  // await Hive.openBox<Settings>("settings");
   runApp(const MyApp());
 }
 
@@ -36,6 +42,9 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Color(0xff0f0f0f),
         appBarTheme: AppBarTheme(
           backgroundColor: Color(0xff0f0f0f),
+          iconTheme: IconThemeData(
+            color: Colors.grey[800],
+          ),
         ),
         canvasColor: Color(0xff0f0f0f),
         iconTheme: IconThemeData(

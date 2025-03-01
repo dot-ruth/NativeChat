@@ -8,11 +8,13 @@ class AIResponse extends StatefulWidget {
   const AIResponse({
     super.key,
     required this.text,
+    required this.isOneSidedChatMode,
     this.isLast = false,
   });
 
   final String text;
   final bool isLast;
+  final bool isOneSidedChatMode;
 
   @override
   State<AIResponse> createState() => _AIResponseState();
@@ -27,15 +29,17 @@ class _AIResponseState extends State<AIResponse> {
         Container(
           width: MediaQuery.of(context).size.width * 0.9,
           margin: EdgeInsets.only(
-            left: 25.0,
+            left: widget.isOneSidedChatMode == true ? 25.0 : 0.0,
           ),
           padding: EdgeInsets.only(
             top: 14.0,
-            bottom: 25.0,
+            bottom: widget.isOneSidedChatMode == true ? 25.0 : 14.0,
           ),
-          decoration: BoxDecoration(
-            border: dashedBorderExtracted,
-          ),
+          decoration: widget.isOneSidedChatMode == true
+              ? BoxDecoration(
+                  border: dashedBorderExtracted,
+                )
+              : BoxDecoration(),
           child: Container(
             margin: EdgeInsets.only(
               left: 6.0,
