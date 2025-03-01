@@ -8,21 +8,19 @@ class ContextToggleRow extends StatefulWidget {
     required this.areCallsInContext,
     required this.areMessagesInContext,
     required this.isDeviceInContext,
+    required this.areAppsInContext,
+    required this.isBatteryInContext,
     required this.isSummarizeInContext,
-    required this.toggleCallsContext,
-    required this.toggleMessageContext,
-    required this.toggleDeviceContext,
-    required this.toggleSummarizeContext,
+    required this.toggleContext,
   });
 
   final bool areCallsInContext;
   final bool areMessagesInContext;
   final bool isDeviceInContext;
+  final bool areAppsInContext;
+  final bool isBatteryInContext;
   final bool isSummarizeInContext;
-  final Function toggleCallsContext;
-  final Function toggleMessageContext;
-  final Function toggleDeviceContext;
-  final Function toggleSummarizeContext;
+  final Function toggleContext;
 
   @override
   State<ContextToggleRow> createState() => _ContextToggleRowState();
@@ -42,25 +40,37 @@ class _ContextToggleRowState extends State<ContextToggleRow> {
             state: widget.areCallsInContext,
             icon: Ionicons.call_outline,
             label: 'Calls',
-            toggleState: widget.toggleCallsContext,
+            toggleState: widget.toggleContext,
           ),
           SystemContextButtons(
             state: widget.areMessagesInContext,
             icon: Ionicons.mail_outline,
             label: 'Messages',
-            toggleState: widget.toggleMessageContext,
+            toggleState: widget.toggleContext,
           ),
           SystemContextButtons(
             state: widget.isDeviceInContext,
             icon: Ionicons.hardware_chip_outline,
             label: 'Device',
-            toggleState: widget.toggleDeviceContext,
+            toggleState: widget.toggleContext,
+          ),
+          SystemContextButtons(
+            state: widget.areAppsInContext,
+            icon: Ionicons.apps_outline,
+            label: 'Apps',
+            toggleState: widget.toggleContext,
+          ),
+          SystemContextButtons(
+            state: widget.isBatteryInContext,
+            icon: Ionicons.battery_half_outline,
+            label: 'Battery',
+            toggleState: widget.toggleContext,
           ),
           SystemContextButtons(
             state: widget.isSummarizeInContext,
             icon: Ionicons.pencil_outline,
             label: 'Summarize',
-            toggleState: widget.toggleSummarizeContext,
+            toggleState: widget.toggleContext,
           ),
         ],
       ),

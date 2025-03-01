@@ -25,11 +25,20 @@ class _InputBoxAndSendButtonState extends State<InputBoxAndSendButton> {
     return Container(
       padding: const EdgeInsets.only(
         left: 18.0,
-        right: 2.0,
+        right: 8.0,
+        top: 2.0,
+        bottom: 15.0,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30.0),
-        color: Color(0xff131313),
+        // borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(
+              20.0,
+            ),
+            topRight: Radius.circular(
+              20.0,
+            )),
+        color: Color(0xff1a1a1a),
       ),
       child: Row(
         children: [

@@ -23,7 +23,7 @@ class _SystemContextButtonsState extends State<SystemContextButtons> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => {
-        widget.toggleState(),
+        widget.toggleState(widget.state),
       },
       child: Container(
         alignment: Alignment.center,

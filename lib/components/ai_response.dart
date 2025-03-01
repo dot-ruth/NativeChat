@@ -5,7 +5,11 @@ import "package:nativechat/components/codeblock.dart";
 import "package:nativechat/components/dashed_border_exracted.dart";
 
 class AIResponse extends StatefulWidget {
-  const AIResponse({super.key, required this.text, this.isLast = false});
+  const AIResponse({
+    super.key,
+    required this.text,
+    this.isLast = false,
+  });
 
   final String text;
   final bool isLast;

@@ -6,15 +6,9 @@ class PromptSuggestionsFeed extends StatefulWidget {
     super.key,
     required this.chatWithAI,
     required this.userMessageController,
-    required this.toggleCallsContext,
-    required this.toggleMessageContext,
-    required this.toggleDeviceContext,
   });
 
   final Function chatWithAI;
-  final Function toggleCallsContext;
-  final Function toggleMessageContext;
-  final Function toggleDeviceContext;
   final TextEditingController userMessageController;
 
   @override
@@ -23,64 +17,21 @@ class PromptSuggestionsFeed extends StatefulWidget {
 
 class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
   var promptSuggestions = [
-    {
-      'context': "areCallsInContext",
-      'prompt': 'Who called me the most?',
-    },
-    {
-      'context': "areMessagesInContext",
-      'prompt': 'Tell me my unread text messages?',
-    },
-    {
-      'context': "isDeviceInContext",
-      'prompt': 'How many cores does my phone have?',
-    },
-    {
-      'context': "areCallsInContext",
-      'prompt': 'What is the longest call I had?',
-    },
-    {
-      'context': "areMessagesInContext",
-      'prompt': 'What is the last bank transaction amount I made?',
-    },
-    {
-      'context': "isDeviceInContext",
-      'prompt': 'Is my phone charging?',
-    },
-    {
-      'context': "areCallsInContext",
-      'prompt': 'Do I have any recent missed calls?',
-    },
-    {
-      'context': "areMessagesInContext",
-      'prompt': 'What is the sweetest text I got recently?',
-    },
-    {
-      'context': "isDeviceInContext",
-      'prompt': 'How many apps do I have?',
-    },
-    {
-      'context': "",
-      'prompt': 'Write code to find the Fibonacci sequence in Zig?',
-    },
+    'Who called me the most?',
+    'Tell me my unread text messages?',
+    'How many cores does my phone have?',
+    'What is the longest call I had?',
+    'What is the last bank transaction amount I made?',
+    'Is my phone charging?',
+    'Do I have any recent missed calls?',
+    'What is the sweetest text I got recently?',
+    'How many apps do I have?',
+    'Write code to find the Fibonacci sequence in Zig?',
   ];
 
   void enterPromptSuggestion(promptObject) {
-    if (promptObject["context"] == "areCallsInContext") {
-      widget.toggleCallsContext(value: true);
-      widget.toggleMessageContext(value: false);
-      widget.toggleDeviceContext(value: false);
-    } else if (promptObject["context"] == "areMessagesInContext") {
-      widget.toggleCallsContext(value: false);
-      widget.toggleMessageContext(value: true);
-      widget.toggleDeviceContext(value: false);
-    } else if (promptObject["context"] == "isDeviceInContext") {
-      widget.toggleCallsContext(value: false);
-      widget.toggleMessageContext(value: false);
-      widget.toggleDeviceContext(value: true);
-    }
     setState(() {
-      widget.userMessageController.text = promptObject["prompt"];
+      widget.userMessageController.text = promptObject;
     });
     widget.chatWithAI();
   }
@@ -89,6 +40,7 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
+        height: 100.0,
         alignment: Alignment.topLeft,
         padding: const EdgeInsets.only(left: 13.0),
         child: ListView.builder(
@@ -102,7 +54,7 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    promptSuggestions[index]["prompt"]!,
+                    promptSuggestions[index],
                     style: TextStyle(
                       color: Colors.grey[600],
                     ),
