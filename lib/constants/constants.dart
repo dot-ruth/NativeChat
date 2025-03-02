@@ -72,9 +72,9 @@ final functionDeclarations = [
     "getDeviceTime",
     "Gets the current date and time of the device, including the timezone.",
     Schema.object(properties: {
-      'currentDateTime': Schema.string(
-          description:
-              "The current date and time in ISO 8601 format, including the timezone."),
+      'dateTime': Schema.string(
+          description: "The current date and time in ISO 8601 format"),
+      'timezone': Schema.string(description: "Includes the device's timezone."),
     }),
   ),
 

@@ -94,7 +94,11 @@ class _HomepageState extends State<Homepage> {
           clearConversation();
         }
       } else {
-        if (functionCallName == "getDeviceSpecs") {
+        if (functionCallName == "getDeviceTime") {
+          setSystemMessage('getting device time...');
+          final deviceTime = await getDeviceTime();
+          advancedContext += deviceTime;
+        } else if (functionCallName == "getDeviceSpecs") {
           setSystemMessage('getting device specs...');
           final deviceSpecs = await getDeviceSpecs();
           advancedContext += deviceSpecs;
@@ -125,7 +129,6 @@ class _HomepageState extends State<Homepage> {
     final chat = model.startChat(history: []);
     final content = Content.text(
         "$userInput CONTEXT: $context. CHAT-HISTORY: ${chatHistory.toString()}");
-    // print("in continueFromFunctionCall $userInput CONTEXT: $context.");
 
     final response = await chat.sendMessage(content);
     gotResponseFromAI(response.text);
@@ -198,7 +201,12 @@ class _HomepageState extends State<Homepage> {
       final chat = model.startChat(history: []);
       final content = Content.text(userInput);
       final response = await chat.sendMessage(content);
-      gotResponseFromAI(response.text);
+      setState(() {
+        chatHistory.add({
+          "from": "ai",
+          "content": response.text,
+        });
+      });
       animateChatHistoryToBottom();
     }
   }
