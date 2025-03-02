@@ -583,7 +583,7 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  dynamic isOneSidedChatMode = false;
+  dynamic isOneSidedChatMode = true;
   void toggleOneSidedChatMode() async {
     Box settingBox = await Hive.openBox("settings");
     isOneSidedChatMode = await settingBox.get("isOneSidedChatMode");
@@ -604,7 +604,7 @@ class _HomepageState extends State<Homepage> {
     Box settingBox = await Hive.openBox("settings");
     isOneSidedChatMode = await settingBox.get("isOneSidedChatMode");
     if (isOneSidedChatMode.toString() == 'null') {
-      await settingBox.put("isOneSidedChatMode", false);
+      await settingBox.put("isOneSidedChatMode", true);
       isOneSidedChatMode = false;
     }
     // Get API Key

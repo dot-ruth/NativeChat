@@ -8,5 +8,5 @@ class Settings extends HiveObject {
   late bool isDarkMode;
 
   @HiveField(1)
-  bool isOneSidedChatMode = false;
+  bool isOneSidedChatMode = true;
 }
