@@ -26,6 +26,8 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
     super.initState();
     promptSuggestions.shuffle();
     randomPromptSuggestions = promptSuggestions.sublist(0, 10).cast<String>();
+    // Sort by character lenght
+    randomPromptSuggestions.sort((a, b) => a.length.compareTo(b.length));
   }
 
   void enterPromptSuggestion(promptObject) {
