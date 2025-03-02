@@ -600,13 +600,19 @@ class _HomepageState extends State<Homepage> {
   }
 
   void getSettings() async {
+    // Is One Sided Chat Mode
     Box settingBox = await Hive.openBox("settings");
     isOneSidedChatMode = await settingBox.get("isOneSidedChatMode");
     if (isOneSidedChatMode.toString() == 'null') {
       await settingBox.put("isOneSidedChatMode", false);
       isOneSidedChatMode = false;
     }
-    Hive.close();
+    // Get API Key
+    apiKey = await settingBox.get("apikey") ?? "";
+    setState(() {});
+
+    // Close
+    await Hive.close();
   }
 
   final SpeechToText speechToText = SpeechToText();
@@ -647,6 +653,10 @@ class _HomepageState extends State<Homepage> {
       chatWithAI();
     }
   }
+
+  String apiKey = '';
+  bool isAddingAPIKey = false;
+  TextEditingController apiKeyController = TextEditingController();
 
   late StreamSubscription _intentDataStreamSubscription;
   List<SharedFile>? sharedList;
@@ -733,6 +743,19 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
         actions: [
+          // API Key
+          IconButton(
+            onPressed: () {
+              setState(() {
+                isAddingAPIKey = !isAddingAPIKey;
+              });
+            },
+            icon: Icon(
+              Ionicons.key_sharp,
+              size: 18.0,
+              color: Theme.of(context).iconTheme.color,
+            ),
+          ),
           // Clear Chat
           IconButton(
             onPressed: () {
@@ -775,7 +798,11 @@ class _HomepageState extends State<Homepage> {
                     summarizeText: summarizeText,
                     chatWithAI: chatWithAI,
                     isSummarizeInContext: isSummarizeInContext,
-                    userMessageController: userMessageController,
+                    userMessageController: isAddingAPIKey == true
+                        ? apiKeyController
+                        : userMessageController,
+                    isAddingAPIKey: isAddingAPIKey,
+                    getSettings: getSettings,
                     startListening: startListening,
                     stopListening: stopListening,
                     speechToText: speechToText,

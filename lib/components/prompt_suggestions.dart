@@ -44,7 +44,10 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
       child: Container(
         height: 100.0,
         alignment: Alignment.topLeft,
-        padding: const EdgeInsets.only(left: 13.0),
+        padding: const EdgeInsets.only(
+          left: 13.0,
+          top: 30.0,
+        ),
         child: ListView.builder(
           itemCount: promptSuggestions.length,
           itemBuilder: (context, index) {

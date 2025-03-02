@@ -12,9 +12,9 @@
 
     <!--Set activity launchMode to singleTop, if you want to creating new activity instance everytime there is a new intent.-->
     <application
-        android:label="nativechat"
+        android:label="NativeChat"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
