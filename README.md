@@ -1,6 +1,6 @@
 ![](./assets/banners/banner.jpg)
 
-# NativeChat: Powered by Gemini
+# NativeChat
 
 NativeChat is a powerful application designed to bring seamless, context-aware interactions to your mobile device. Using Gemini under the hood, it offers a wide range of features to assist with tasks like fetching system specs, analyzing call logs, summarizing SMS messages, and providing insights into your device’s status. NativeChat makes your chat experience better by providing real-time data and personalized responses.
 
