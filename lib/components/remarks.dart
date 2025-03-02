@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nativechat/constants/constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Remarks extends StatefulWidget {
   const Remarks({super.key});
@@ -28,6 +30,19 @@ class _RemarksState extends State<Remarks> {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.grey[600]!,
+            ),
+          ),
+          GestureDetector(
+            onTap: () async {
+              // Open the project source code in a browser
+              await launchUrl(Uri.parse(github));
+            },
+            child: Text(
+              "This project is free and open source. Click here to star, contribute or view the project source code.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.blueAccent,
+              ),
             ),
           ),
         ],

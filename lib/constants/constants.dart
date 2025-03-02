@@ -1,6 +1,7 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 final String googleAIStudioURL = "https://aistudio.google.com/app/apikey";
+final String github = "https://github.com/dagmawibabi/NativeChat";
 
 final List promptSuggestions = [
   "Show me 3 beautiful math equations",
