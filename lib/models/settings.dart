@@ -9,4 +9,7 @@ class Settings extends HiveObject {
 
   @HiveField(1)
   bool isOneSidedChatMode = true;
+
+  @HiveField(2)
+  String apikey = "";
 }

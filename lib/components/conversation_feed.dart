@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nativechat/components/ai_response.dart';
 import 'package:nativechat/components/system_response.dart';
@@ -26,6 +27,9 @@ class _ConversationFeedState extends State<ConversationFeed> {
     return Expanded(
       flex: 3,
       child: ListView.builder(
+        padding: const EdgeInsets.only(
+          bottom: 200.0,
+        ),
         controller: widget.scrollController,
         itemCount: widget.chatHistory.length,
         itemBuilder: (context, index) {
@@ -39,7 +43,7 @@ class _ConversationFeedState extends State<ConversationFeed> {
               isSystem
                   ? widget.isOneSidedChatMode == false
                       ? SystemResponse(
-                          text: widget.chatHistory[index]['content'].toString(),
+                          chatObject: widget.chatHistory[index],
                           isOneSidedChatMode: widget.isOneSidedChatMode,
                         )
                       : Column(
@@ -47,17 +51,30 @@ class _ConversationFeedState extends State<ConversationFeed> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             SystemResponse(
-                              text: widget.chatHistory[index]['content']
-                                  .toString(),
+                              chatObject: widget.chatHistory[index],
                               isOneSidedChatMode: widget.isOneSidedChatMode,
                             ),
-                            Container(
-                              padding: const EdgeInsets.only(left: 18.0),
-                              child: LoadingAnimationWidget.beat(
-                                color: Colors.grey[600]!,
-                                size: 14,
-                              ),
-                            ),
+                            widget.chatHistory[index]["isError"] == true
+                                ? isLast == true
+                                    ? Container(
+                                        alignment: Alignment.centerLeft,
+                                        padding: const EdgeInsets.only(
+                                          left: 16.0,
+                                        ),
+                                        child: Icon(
+                                          Ionicons.ellipse,
+                                          size: 18.0,
+                                          color: Colors.grey[900],
+                                        ),
+                                      )
+                                    : Container()
+                                : Container(
+                                    padding: const EdgeInsets.only(left: 18.0),
+                                    child: LoadingAnimationWidget.beat(
+                                      color: Colors.grey[600]!,
+                                      size: 14,
+                                    ),
+                                  ),
                           ],
                         )
                   : isUser

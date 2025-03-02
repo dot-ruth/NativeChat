@@ -30,7 +30,7 @@ class _CodeblockState extends State<Codeblock> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Color(0xff171717),
+      color: Color(0xff121212),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -99,7 +99,7 @@ class _CodeblockState extends State<Codeblock> {
               widget.code,
               maxLines: _collapse ? 5 : null,
               style: TextStyle(
-                color: Colors.grey[500],
+                color: Colors.grey[400],
               ),
             ),
           ),

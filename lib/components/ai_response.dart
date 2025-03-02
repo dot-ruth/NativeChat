@@ -46,12 +46,11 @@ class _AIResponseState extends State<AIResponse> {
             ),
             padding: EdgeInsets.symmetric(
               horizontal: 8.0,
-              // vertical: 5.0,
             ),
             child: GptMarkdown(
               widget.text,
               style: TextStyle(
-                color: Colors.grey[500],
+                color: Colors.grey[400],
               ),
               codeBuilder: (context, name, code, closed) =>
                   Codeblock(code: code, name: name),
@@ -67,7 +66,7 @@ class _AIResponseState extends State<AIResponse> {
                 child: Icon(
                   Ionicons.ellipse,
                   size: 18.0,
-                  color: Colors.grey[900],
+                  color: Colors.grey[800],
                 ),
               )
             : Container(),

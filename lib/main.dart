@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:nativechat/models/settings.dart';
+// import 'package:flutter/services.dart';
 
 import 'pages/homepage.dart';
 
@@ -8,7 +9,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(SettingsAdapter());
-  // await Hive.openBox<Settings>("settings");
   runApp(const MyApp());
 }
 
@@ -22,6 +22,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    var darkGreyColor = Color(0xff0a0a0a);
+    // var darkGreyColor = Color(0xff0f0f0f);
     // SystemChrome.setSystemUIOverlayStyle(
     //   const SystemUiOverlayStyle(
     //     statusBarColor: Colors.transparent,
@@ -30,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     // );
 
     // SystemChrome.setEnabledSystemUIMode(
-    //   SystemUiMode.edgeToEdge,
+    //   SystemUiMode.immersive,
     //   overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
     // );
 
@@ -39,16 +41,15 @@ class _MyAppState extends State<MyApp> {
       initialRoute: "/",
       routes: {"/": (context) => const Homepage()},
       theme: ThemeData(
-        scaffoldBackgroundColor: Color(0xff0f0f0f),
+        scaffoldBackgroundColor: darkGreyColor,
         appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xff0f0f0f),
+          backgroundColor: darkGreyColor,
           iconTheme: IconThemeData(
             color: Colors.grey[800],
           ),
         ),
-        canvasColor: Color(0xff0f0f0f),
         iconTheme: IconThemeData(
-          color: Colors.grey[600],
+          color: Colors.grey[500]!,
         ),
       ),
     );

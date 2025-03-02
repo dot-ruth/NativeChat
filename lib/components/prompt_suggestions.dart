@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:nativechat/constants/constants.dart';
 
 class PromptSuggestionsFeed extends StatefulWidget {
   const PromptSuggestionsFeed({
@@ -18,18 +19,14 @@ class PromptSuggestionsFeed extends StatefulWidget {
 }
 
 class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
-  var promptSuggestions = [
-    'Who called me the most?',
-    'Tell me my unread text messages?',
-    'How many cores does my phone have?',
-    'What is the longest call I had?',
-    'What is the last bank transaction amount I made?',
-    'Is my phone charging?',
-    'Do I have any recent missed calls?',
-    'What is the sweetest text I got recently?',
-    'How many apps do I have?',
-    'Write code to find the Fibonacci sequence in Zig?',
-  ];
+  late List<String> randomPromptSuggestions;
+
+  @override
+  void initState() {
+    super.initState();
+    promptSuggestions.shuffle();
+    randomPromptSuggestions = promptSuggestions.sublist(0, 10).cast<String>();
+  }
 
   void enterPromptSuggestion(promptObject) {
     setState(() {
@@ -49,11 +46,11 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
           top: 30.0,
         ),
         child: ListView.builder(
-          itemCount: promptSuggestions.length,
+          itemCount: randomPromptSuggestions.length,
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                enterPromptSuggestion(promptSuggestions[index]);
+                enterPromptSuggestion(randomPromptSuggestions[index]);
               },
               child: Column(
                 crossAxisAlignment: widget.isOneSidedChatMode
@@ -61,9 +58,9 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
                     : CrossAxisAlignment.center,
                 children: [
                   Text(
-                    promptSuggestions[index],
+                    randomPromptSuggestions[index],
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: Colors.grey[400],
                     ),
                   ),
                   Container(
@@ -77,7 +74,7 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
                           )
                         : BoxDecoration(),
                   ),
-                  index == promptSuggestions.length - 1
+                  index == randomPromptSuggestions.length - 1
                       ? Row(
                           mainAxisAlignment: widget.isOneSidedChatMode
                               ? MainAxisAlignment.start
@@ -91,7 +88,7 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
                               child: Icon(
                                 Ionicons.ellipse,
                                 size: 18.0,
-                                color: Colors.grey[900],
+                                color: Colors.grey[800],
                               ),
                             ),
                           ],

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class InputBoxAndSendButton extends StatefulWidget {
-  const InputBoxAndSendButton({
+class InputBox extends StatefulWidget {
+  const InputBox({
     super.key,
     required this.summarizeText,
     required this.chatWithAI,
@@ -16,8 +14,6 @@ class InputBoxAndSendButton extends StatefulWidget {
     required this.speechToText,
     required this.startListening,
     required this.stopListening,
-    required this.isAddingAPIKey,
-    required this.getSettings,
   });
 
   final Function summarizeText;
@@ -29,42 +25,17 @@ class InputBoxAndSendButton extends StatefulWidget {
   final Function startListening;
   final Function stopListening;
   final bool isInVoiceMode;
-  final bool isAddingAPIKey;
-  final Function getSettings;
 
   @override
-  State<InputBoxAndSendButton> createState() => _InputBoxAndSendButtonState();
+  State<InputBox> createState() => _InputBoxState();
 }
 
-class _InputBoxAndSendButtonState extends State<InputBoxAndSendButton> {
+class _InputBoxState extends State<InputBox> {
   bool isVoiceMode = false;
-  var googleAIStudioURL = "https://aistudio.google.com/app/apikey";
-  void getAPIKey() async {
-    await launchUrl(Uri.parse(googleAIStudioURL));
-  }
-
-  void saveAPIKey() async {
-    var newAPIKey = widget.userMessageController.text.trim();
-    if (newAPIKey != "") {
-      Box apiBox = await Hive.openBox("apibox");
-      await apiBox.put("apikey", newAPIKey);
-      await Hive.close();
-    }
-    widget.getSettings();
-  }
-
-  void clearAPIKey() async {
-    // apiKey = "";
-    Box apiBox = await Hive.openBox("apibox");
-    await apiBox.put("apikey", "");
-    await Hive.close();
-    widget.getSettings();
-  }
 
   @override
   void initState() {
     super.initState();
-    widget.getSettings();
   }
 
   @override
@@ -77,7 +48,6 @@ class _InputBoxAndSendButtonState extends State<InputBoxAndSendButton> {
         bottom: 10.0,
       ),
       decoration: BoxDecoration(
-        // borderRadius: BorderRadius.circular(30.0),
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(
               20.0,
@@ -103,210 +73,131 @@ class _InputBoxAndSendButtonState extends State<InputBoxAndSendButton> {
                         minLines: 1,
                         maxLines: 5,
                         decoration: InputDecoration(
-                          hintText: widget.isAddingAPIKey
-                              ? "add api key..."
-                              : "ask about anything...",
-                          hintStyle: TextStyle(color: Colors.grey[700]),
+                          hintText: "ask about anything...",
+                          hintStyle: TextStyle(color: Colors.grey[500]),
                           border: InputBorder.none,
                         ),
                       ),
                     ),
-                    // Send Button
-                    widget.isAddingAPIKey == true
-                        ? Container()
-                        : IconButton(
-                            onPressed: () {
-                              widget.isSummarizeInContext == true
-                                  ? widget.summarizeText(fromUserInput: true)
-                                  : widget.chatWithAI();
-                            },
-                            icon: Icon(
-                              Ionicons.paper_plane_outline,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                          ),
                   ],
                 ),
           SizedBox(height: 12.0),
-          widget.isAddingAPIKey
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  spacing: 10.0,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        getAPIKey();
-                      },
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 15.0,
-                            vertical: 6.0,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey[800]!,
-                            ),
-                            borderRadius: BorderRadius.circular(100.0),
-                          ),
-                          child: Text(
-                            'Get API Key',
-                            style: TextStyle(
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                          )),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 15.0,
-                            vertical: 6.0,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey[800]!,
-                            ),
-                            borderRadius: BorderRadius.circular(100.0),
-                          ),
-                          child: Text(
-                            'Save API Key',
-                            style: TextStyle(
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                          )),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 15.0,
-                            vertical: 6.0,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey[800]!,
-                            ),
-                            borderRadius: BorderRadius.circular(100.0),
-                          ),
-                          child: Text(
-                            'Clear API Key',
-                            style: TextStyle(
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                          )),
-                    ),
-                  ],
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      spacing: 10.0,
-                      children: [
-                        // Attach Files
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15.0,
-                              vertical: 6.0,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey[800]!,
-                              ),
-                              borderRadius: BorderRadius.circular(100.0),
-                            ),
-                            child: Row(
-                              spacing: 4.0,
-                              children: [
-                                Icon(
-                                  Icons.attach_file_outlined,
-                                  color: Theme.of(context).iconTheme.color,
-                                  size: 18.0,
-                                ),
-                                Text(
-                                  'Attach File',
-                                  style: TextStyle(
-                                    color: Theme.of(context).iconTheme.color,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                spacing: 12.0,
+                children: [
+                  // Attach Files
+                  // GestureDetector(
+                  //   onTap: () {},
+                  //   child: Container(
+                  //     padding: const EdgeInsets.symmetric(
+                  //       horizontal: 15.0,
+                  //       vertical: 6.0,
+                  //     ),
+                  //     decoration: BoxDecoration(
+                  //       border: Border.all(
+                  //         color:
+                  //             Theme.of(context).iconTheme.color!.withAlpha(100),
+                  //       ),
+                  //       borderRadius: BorderRadius.circular(100.0),
+                  //     ),
+                  //     child: Row(
+                  //       spacing: 4.0,
+                  //       children: [
+                  //         Icon(
+                  //           Icons.attach_file_outlined,
+                  //           color: Theme.of(context).iconTheme.color,
+                  //           size: 18.0,
+                  //         ),
+                  //         Text(
+                  //           'Attach File',
+                  //           style: TextStyle(
+                  //             color: Theme.of(context).iconTheme.color,
+                  //           ),
+                  //         )
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  // Voice Mode
+                  GestureDetector(
+                    onTap: () {
+                      widget.toggleVoiceMode();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0,
+                        vertical: 6.0,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: widget.isInVoiceMode
+                              ? Colors.greenAccent
+                              : Theme.of(context)
+                                  .iconTheme
+                                  .color!
+                                  .withAlpha(100),
                         ),
-                        // Voice Mode
-                        GestureDetector(
-                          onTap: () {
-                            widget.toggleVoiceMode();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15.0,
-                              vertical: 6.0,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: widget.isInVoiceMode
-                                    ? Colors.greenAccent
-                                    : Colors.grey[800]!,
-                              ),
-                              borderRadius: BorderRadius.circular(100.0),
-                            ),
-                            child: Row(
-                              spacing: 4.0,
-                              children: [
-                                Icon(
-                                  widget.isInVoiceMode
-                                      ? Icons.mic
-                                      : Icons.mic_off,
-                                  color: widget.isInVoiceMode
-                                      ? Colors.greenAccent
-                                      : Theme.of(context).iconTheme.color,
-                                  size: 18.0,
-                                ),
-                                Text(
-                                  'Voice Mode',
-                                  style: TextStyle(
-                                    color: widget.isInVoiceMode
-                                        ? Colors.greenAccent
-                                        : Theme.of(context).iconTheme.color,
-                                  ),
-                                )
-                              ],
-                            ),
+                        borderRadius: BorderRadius.circular(100.0),
+                      ),
+                      child: Row(
+                        spacing: 4.0,
+                        children: [
+                          Icon(
+                            widget.isInVoiceMode ? Icons.mic : Icons.mic_off,
+                            color: widget.isInVoiceMode
+                                ? Colors.greenAccent
+                                : Theme.of(context).iconTheme.color,
+                            size: 18.0,
                           ),
-                        ),
-                      ],
-                    ),
-
-                    // Mic Button
-                    widget.isInVoiceMode
-                        ? IconButton(
-                            onPressed: () {
-                              widget.speechToText.isNotListening
-                                  ? widget.startListening()
-                                  : widget.stopListening();
-                            },
-                            icon: Icon(
-                              widget.speechToText.isNotListening
-                                  ? Icons.mic_off
-                                  : Icons.mic,
-                              color: widget.speechToText.isNotListening
-                                  ? Theme.of(context).iconTheme.color
-                                  : Colors.greenAccent,
+                          Text(
+                            'Voice Mode',
+                            style: TextStyle(
+                              color: widget.isInVoiceMode
+                                  ? Colors.greenAccent
+                                  : Theme.of(context).iconTheme.color,
                             ),
                           )
-                        : IconButton(
-                            icon: Icon(
-                              Icons.abc,
-                              color: Color(0xff1a1a1a),
-                            ),
-                            onPressed: () {},
-                          ),
-                  ],
-                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Send and Mic Button
+              widget.isInVoiceMode
+                  ? IconButton(
+                      onPressed: () {
+                        widget.speechToText.isNotListening
+                            ? widget.startListening()
+                            : widget.stopListening();
+                      },
+                      icon: Icon(
+                        widget.speechToText.isNotListening
+                            ? Icons.mic_off
+                            : Icons.mic,
+                        color: widget.speechToText.isNotListening
+                            ? Theme.of(context).iconTheme.color
+                            : Colors.greenAccent,
+                      ),
+                    )
+                  : IconButton(
+                      onPressed: () {
+                        widget.isSummarizeInContext == true
+                            ? widget.summarizeText(fromUserInput: true)
+                            : widget.chatWithAI();
+                      },
+                      icon: Icon(
+                        Ionicons.paper_plane_outline,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                    ),
+            ],
+          ),
         ],
       ),
     );

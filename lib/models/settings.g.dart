@@ -18,17 +18,20 @@ class SettingsAdapter extends TypeAdapter<Settings> {
     };
     return Settings()
       ..isDarkMode = fields[0] as bool
-      ..isOneSidedChatMode = fields[1] as bool;
+      ..isOneSidedChatMode = fields[1] as bool
+      ..apikey = fields[2] as String;
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.isDarkMode)
       ..writeByte(1)
-      ..write(obj.isOneSidedChatMode);
+      ..write(obj.isOneSidedChatMode)
+      ..writeByte(2)
+      ..write(obj.apikey);
   }
 
   @override

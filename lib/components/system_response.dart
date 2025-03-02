@@ -5,11 +5,11 @@ import 'package:nativechat/components/dashed_border_exracted.dart';
 class SystemResponse extends StatefulWidget {
   const SystemResponse({
     super.key,
-    required this.text,
+    required this.chatObject,
     required this.isOneSidedChatMode,
   });
 
-  final String text;
+  final dynamic chatObject;
   final bool isOneSidedChatMode;
 
   @override
@@ -55,13 +55,15 @@ class _SystemResponseState extends State<SystemResponse> {
                 //   duration: Duration(milliseconds: 1000),
                 // ),
                 ColorizeAnimatedText(
-                  widget.text,
+                  widget.chatObject['content'].toString().trim(),
                   textStyle: TextStyle(
                     color: Colors.grey[500],
                     fontSize: 14.0,
                   ),
                   colors: [
-                    Colors.grey[700]!,
+                    widget.chatObject['isError']
+                        ? Colors.redAccent
+                        : Colors.grey[700]!,
                     Colors.grey[800]!,
                     Colors.grey[900]!,
                   ],
