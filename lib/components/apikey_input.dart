@@ -102,9 +102,10 @@ class _APIKeyInputState extends State<APIKeyInput> {
           ),
           SizedBox(height: 18.0),
           // API Key Buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            spacing: 10.0,
+          Wrap(
+            spacing: 5.0,
+            runSpacing: 5.0,
+            alignment: WrapAlignment.center,
             children: [
               // Get API Key
               GestureDetector(
