@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
@@ -29,19 +30,74 @@ class _HomepageState extends State<Homepage> {
   ScrollController scrollController = ScrollController();
   late GenerativeModel model;
   var chatHistory = [];
-
+  bool _loading = false;
   var installedAppsString = '';
   var installedAppsLength = 0;
+  Uint8List? attachedImageBytes;
+  String? attachedMime;
 
+  Future<void> _sendImageFilePrompt() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      // Pick an image file.
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) {
+        setState(() {
+          _loading = false;
+        });
+        return;
+      }
+      attachedImageBytes = result.files.first.bytes;
+      attachedMime = result.files.first.extension?.toLowerCase() == 'png'
+          ? 'image/png'
+          : 'image/jpeg';
+
+      setState(() {
+        chatHistory.add({
+          "from": "user",
+          "content": "",
+          "image": attachedImageBytes,
+        });
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+      // Handle error as needed.
+    }
+  }
+// Updated chatWithAI method to check for attached image data.
+// If present, compose a multi-part message using both prompt and image.
   void chatWithAI() async {
-    if (userMessageController.text.trim().isEmpty == false) {
+    if (userMessageController.text.trim().isNotEmpty) {
       var userInput = userMessageController.text.trim();
       userMessageController.clear();
       addUserInputToChatHistory(userInput);
       setSystemMessage('getting response...');
 
       final chat = model.startChat(history: []);
-      final content = Content.text('$userInput CONTEXT: $chatHistory');
+      Content content;
+
+      // Check if an image is attached.
+      if (attachedImageBytes != null && attachedMime != null) {
+        // Create multi-part content with text and image.
+        content = Content.multi([
+          TextPart(userInput),
+          DataPart(attachedMime!, attachedImageBytes!),
+        ]);
+        // Reset the attached image data after sending.
+        attachedImageBytes = null;
+        attachedMime = null;
+      } else {
+        content = Content.text('$userInput CONTEXT: $chatHistory');
+      }
+
       try {
         final response = await chat.sendMessage(content);
         if (response.functionCalls.isNotEmpty) {
@@ -418,6 +474,7 @@ class _HomepageState extends State<Homepage> {
                       getSettings: getSettings,
                     )
                   : InputBox(
+                attachFile: _sendImageFilePrompt,
                       summarizeText: summarizeText,
                       chatWithAI: chatWithAI,
                       isSummarizeInContext: isSummarizeInContext,
