@@ -100,7 +100,7 @@ class _CodeblockState extends State<Codeblock> {
               maxLines: _collapse ? 5 : null,
               style: TextStyle(
                 color: Colors.grey[400],
-                fontFamily: 'monospace',
+                // fontFamily: 'monospace',
               ),
             ),
           ),
