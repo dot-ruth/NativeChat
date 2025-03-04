@@ -72,6 +72,7 @@ class _HomepageState extends State<Homepage> {
       // Handle error as needed.
     }
   }
+
 // Updated chatWithAI method to check for attached image data.
 // If present, compose a multi-part message using both prompt and image.
   void chatWithAI() async {
@@ -474,7 +475,7 @@ class _HomepageState extends State<Homepage> {
                       getSettings: getSettings,
                     )
                   : InputBox(
-                attachFile: _sendImageFilePrompt,
+                      attachFile: _sendImageFilePrompt,
                       summarizeText: summarizeText,
                       chatWithAI: chatWithAI,
                       isSummarizeInContext: isSummarizeInContext,

@@ -36,13 +36,24 @@ class _UserInputState extends State<UserInput> {
           padding: EdgeInsets.symmetric(
             horizontal: 8.0,
           ),
-          child: Text(
-            widget.text,
-            textAlign: widget.isOneSidedChatMode == true
-                ? TextAlign.left
-                : TextAlign.right,
-            style: TextStyle(
-              color: Colors.white,
+          child: Container(
+            decoration: widget.isOneSidedChatMode
+                ? null
+                : BoxDecoration(
+                    color: Colors.grey[900]!,
+                    borderRadius: BorderRadius.circular(100.0),
+                  ),
+            padding: widget.isOneSidedChatMode
+                ? EdgeInsets.all(0.0)
+                : EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+            child: Text(
+              widget.text,
+              textAlign: widget.isOneSidedChatMode == true
+                  ? TextAlign.left
+                  : TextAlign.right,
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
           ),
         ),

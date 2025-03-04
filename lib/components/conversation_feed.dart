@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nativechat/components/ai_response.dart';
+import 'package:nativechat/components/chat_image_container.dart';
 import 'package:nativechat/components/system_response.dart';
 import 'package:nativechat/components/user_input.dart';
 
@@ -26,7 +27,7 @@ class _ConversationFeedState extends State<ConversationFeed> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: 3,
+      flex: 2,
       child: ListView.builder(
         padding: const EdgeInsets.only(bottom: 200.0),
         controller: widget.scrollController,
@@ -42,37 +43,37 @@ class _ConversationFeedState extends State<ConversationFeed> {
           if (isSystem) {
             messageWidget = widget.isOneSidedChatMode == false
                 ? SystemResponse(
-              chatObject: chat,
-              isOneSidedChatMode: widget.isOneSidedChatMode,
-            )
+                    chatObject: chat,
+                    isOneSidedChatMode: widget.isOneSidedChatMode,
+                  )
                 : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SystemResponse(
-                  chatObject: chat,
-                  isOneSidedChatMode: widget.isOneSidedChatMode,
-                ),
-                chat["isError"] == true
-                    ? isLast == true
-                    ? Container(
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.only(left: 16.0),
-                  child: Icon(
-                    Ionicons.ellipse,
-                    size: 18.0,
-                    color: Colors.grey[900],
-                  ),
-                )
-                    : Container()
-                    : Container(
-                  padding: const EdgeInsets.only(left: 18.0),
-                  child: LoadingAnimationWidget.beat(
-                    color: Colors.grey[600]!,
-                    size: 14,
-                  ),
-                ),
-              ],
-            );
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SystemResponse(
+                        chatObject: chat,
+                        isOneSidedChatMode: widget.isOneSidedChatMode,
+                      ),
+                      chat["isError"] == true
+                          ? isLast == true
+                              ? Container(
+                                  alignment: Alignment.centerLeft,
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Icon(
+                                    Ionicons.ellipse,
+                                    size: 18.0,
+                                    color: Colors.grey[900],
+                                  ),
+                                )
+                              : Container()
+                          : Container(
+                              padding: const EdgeInsets.only(left: 18.0),
+                              child: LoadingAnimationWidget.beat(
+                                color: Colors.grey[600]!,
+                                size: 14,
+                              ),
+                            ),
+                    ],
+                  );
           } else if (isUser) {
             messageWidget = UserInput(
               text: chat['content'],
@@ -87,30 +88,9 @@ class _ConversationFeedState extends State<ConversationFeed> {
           }
 
           if (chat.containsKey('image') && chat['image'] != null) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8.0,
-                      horizontal: 16.0,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 300,
-                      ),
-                      child: Image.memory(
-                        chat['image'],
-                        fit: BoxFit.cover,
-                        height: 200,
-                      ),
-                    ),
-                  ),
-                ),
-                messageWidget,
-              ],
+            return ChatImageContainer(
+              isOneSidedChatMode: widget.isOneSidedChatMode,
+              image: chat['image'],
             );
           } else {
             return messageWidget;
