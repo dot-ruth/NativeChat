@@ -17,6 +17,7 @@ import 'package:nativechat/utils/get_device_context.dart';
 import 'package:nativechat/utils/tts.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -33,9 +34,14 @@ class _HomepageState extends State<Homepage> {
   bool _loading = false;
   var installedAppsString = '';
   var installedAppsLength = 0;
+  bool _showingAttachmentOptions = false;
   Uint8List? attachedImageBytes;
   String? attachedMime;
-
+  void _toggleAttachmentOptions() {
+    setState(() {
+      _showingAttachmentOptions = !_showingAttachmentOptions;
+    });
+  }
   Future<void> _sendImageFilePrompt() async {
     setState(() {
       _loading = true;
@@ -141,6 +147,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   var appFunctions = ['clearConversation'];
+
   Future<void> functionCallHandler(userInput, functionCalls) async {
     var advancedContext = '';
     for (var eachFunctionCall in functionCalls) {
@@ -358,7 +365,137 @@ class _HomepageState extends State<Homepage> {
     // Model Initialization
     modelInitialization();
   }
+  bool _isImageFile(String? extension) {
+    if (extension == null) return false;
+    final imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+    return imageExtensions.contains(extension.toLowerCase());
+  }
+  Future<void> _pickFile() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) {
+        setState(() {
+          _loading = false;
+        });
+        return;
+      }
+      final file = result.files.first;
 
+      setState(() {
+        chatHistory.add({
+          "from": "user",
+          "content": "",
+          "file": {
+            "name": file.name,
+            "bytes": file.bytes,
+            "mime": _determineMimeType(file.extension),
+            "isImage": _isImageFile(file.extension),
+          }
+        });
+        _loading = false;
+
+        attachedImageBytes = file.bytes;
+        attachedMime = _determineMimeType(file.extension);
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) {
+        setState(() {
+          _loading = false;
+        });
+        return;
+      }
+      attachedImageBytes = result.files.first.bytes;
+      attachedMime = _determineMimeType(result.files.first.extension);
+
+      setState(() {
+        chatHistory.add({
+          "from": "user",
+          "content": "",
+          "image": attachedImageBytes,
+        });
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _captureImageFromCamera() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+      if (image == null) {
+        setState(() {
+          _loading = false;
+        });
+        return;
+      }
+
+      attachedImageBytes = await image.readAsBytes();
+      attachedMime = _determineMimeType(image.path.split('.').last);
+
+      setState(() {
+        chatHistory.add({
+          "from": "user",
+          "content": "",
+          "image": attachedImageBytes,
+        });
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  String _determineMimeType(String? extension) {
+    if (extension == null) return 'application/octet-stream';
+
+    switch (extension.toLowerCase()) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'pdf':
+        return 'application/pdf';
+      case 'doc':
+      case 'docx':
+        return 'application/msword';
+      default:
+        return 'application/octet-stream';
+    }
+  }
   void modelInitialization() {
     // Model
     model = GenerativeModel(
@@ -385,7 +522,44 @@ class _HomepageState extends State<Homepage> {
       ),
     );
   }
-
+  Widget _buildAnimatedIconButton(IconData icon, VoidCallback onPressed) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 200),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey[900],
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: IconButton(
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+              icon: Icon(icon, size: 24),
+              color: Theme.of(context).colorScheme.onSecondary,
+              onPressed: () {
+                setState(() {
+                  _showingAttachmentOptions = false;
+                });
+                onPressed();
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
   void initializations() async {
     // Clear Chat
     chatHistory = [];
@@ -467,25 +641,49 @@ class _HomepageState extends State<Homepage> {
                       isOneSidedChatMode: isOneSidedChatMode,
                     ),
           Column(
-            spacing: 10.0,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (_showingAttachmentOptions)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  margin: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    spacing: 10,
+                    children: [
+                      _buildAnimatedIconButton(
+                        Icons.file_present_rounded,
+                        _pickFile,
+                      ),
+                      _buildAnimatedIconButton(
+                        Icons.image_rounded,
+                        _pickImageFromGallery,
+                      ),
+                      _buildAnimatedIconButton(
+                        Icons.camera_alt_rounded,
+                        _captureImageFromCamera,
+                      ),
+                    ],
+                  ),
+                ),
               isAddingAPIKey == true
                   ? APIKeyInput(
-                      getSettings: getSettings,
-                    )
+                getSettings: getSettings,
+              )
                   : InputBox(
-                      attachFile: _sendImageFilePrompt,
-                      summarizeText: summarizeText,
-                      chatWithAI: chatWithAI,
-                      isSummarizeInContext: isSummarizeInContext,
-                      userMessageController: userMessageController,
-                      startListening: startListening,
-                      stopListening: stopListening,
-                      speechToText: speechToText,
-                      toggleVoiceMode: toggleVoiceMode,
-                      isInVoiceMode: isInVoiceMode,
-                    ),
+                attachFile: _toggleAttachmentOptions,
+                summarizeText: summarizeText,
+                chatWithAI: chatWithAI,
+                isSummarizeInContext: isSummarizeInContext,
+                userMessageController: userMessageController,
+                startListening: startListening,
+                stopListening: stopListening,
+                speechToText: speechToText,
+                toggleVoiceMode: toggleVoiceMode,
+                isInVoiceMode: isInVoiceMode,
+              ),
             ],
           ),
         ],
