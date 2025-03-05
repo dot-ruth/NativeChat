@@ -3,6 +3,7 @@ import "package:gpt_markdown/gpt_markdown.dart";
 import "package:ionicons/ionicons.dart";
 import "package:nativechat/components/codeblock.dart";
 import "package:nativechat/components/dashed_border_exracted.dart";
+import "package:theme_provider/theme_provider.dart";
 
 class AIResponse extends StatefulWidget {
   const AIResponse({
@@ -50,7 +51,7 @@ class _AIResponseState extends State<AIResponse> {
             child: GptMarkdown(
               widget.text,
               style: TextStyle(
-                color: Colors.grey[400],
+                color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.grey[600] : Colors.grey[400]
               ),
               codeBuilder: (context, name, code, closed) =>
                   Codeblock(code: code, name: name),

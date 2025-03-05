@@ -62,7 +62,7 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
                   Text(
                     randomPromptSuggestions[index],
                     style: TextStyle(
-                      color: Colors.grey[400],
+                      color: Colors.grey[500],
                     ),
                   ),
                   Container(

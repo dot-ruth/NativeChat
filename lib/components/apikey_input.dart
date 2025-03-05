@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nativechat/constants/constants.dart';
+import 'package:theme_provider/theme_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hive/hive.dart';
 
@@ -76,7 +77,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
             topRight: Radius.circular(
               20.0,
             )),
-        color: Color(0xff1a1a1a),
+        color:ThemeProvider.themeOf(context).id == "light_theme" ? const Color(0xfff2f2f2) : const Color(0xff1a1a1a)
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,8 +88,8 @@ class _APIKeyInputState extends State<APIKeyInput> {
               Expanded(
                 child: TextField(
                   controller: apiKeyController,
-                  cursorColor: Colors.white,
-                  style: TextStyle(color: Colors.white),
+                  cursorColor: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white,
+                  style: TextStyle(color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white),
                   minLines: 1,
                   maxLines: 5,
                   decoration: InputDecoration(
@@ -126,7 +127,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
                     child: Text(
                       'Get API Key',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white
                       ),
                     )),
               ),
@@ -150,7 +151,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
                     child: Text(
                       'Save API Key',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white
                       ),
                     )),
               ),
@@ -174,7 +175,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
                     child: Text(
                       'Clear API Key',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white
                       ),
                     )),
               ),

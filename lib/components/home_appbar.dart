@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 class HomeAppbar extends StatefulWidget implements PreferredSizeWidget {
   const HomeAppbar({
@@ -48,6 +49,18 @@ class _HomeAppbarState extends State<HomeAppbar> {
             color: Theme.of(context).iconTheme.color,
           ),
         ),
+
+        //Change Theme
+        IconButton(
+            onPressed: () {
+              ThemeProvider.controllerOf(context).nextTheme();
+            },
+            icon: Icon(
+              ThemeProvider.themeOf(context).id == "light_theme" ? Icons.dark_mode_outlined : Icons.wb_sunny_outlined,
+              size: 20.0,
+              color: Theme.of(context).iconTheme.color
+            ),
+          ),
 
         // Clear Chat
         IconButton(
