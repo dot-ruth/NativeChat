@@ -51,7 +51,7 @@ class _AIResponseState extends State<AIResponse> {
             child: GptMarkdown(
               widget.text,
               style: TextStyle(
-                color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.grey[600] : Colors.grey[400]
+                color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.grey[400]
               ),
               codeBuilder: (context, name, code, closed) =>
                   Codeblock(code: code, name: name),

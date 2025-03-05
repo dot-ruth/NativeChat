@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
 
     return ThemeProvider(
       saveThemesOnChange: true,
-      loadThemeOnInit: true,
+      defaultThemeId: "dark_theme",
       themes: [
         AppTheme(
           id: "light_theme",
