@@ -38,18 +38,6 @@ class _HomeAppbarState extends State<HomeAppbar> {
           ),
         ),
 
-        // Change chat layout
-        IconButton(
-          onPressed: widget.toggleOneSidedChatMode,
-          icon: Icon(
-            widget.isOneSidedChatMode == true
-                ? Icons.align_horizontal_right_outlined
-                : Icons.align_horizontal_left_outlined,
-            size: 20.0,
-            color: Theme.of(context).iconTheme.color,
-          ),
-        ),
-
         //Change Theme
         IconButton(
             onPressed: () {
@@ -61,6 +49,18 @@ class _HomeAppbarState extends State<HomeAppbar> {
               color: Theme.of(context).iconTheme.color
             ),
           ),
+
+        // Change chat layout
+        IconButton(
+          onPressed: widget.toggleOneSidedChatMode,
+          icon: Icon(
+            widget.isOneSidedChatMode == true
+                ? Icons.align_horizontal_right_outlined
+                : Icons.align_horizontal_left_outlined,
+            size: 20.0,
+            color: Theme.of(context).iconTheme.color,
+          ),
+        ),
 
         // Clear Chat
         IconButton(
