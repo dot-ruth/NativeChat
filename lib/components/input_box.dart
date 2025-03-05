@@ -130,7 +130,7 @@ class _InputBoxState extends State<InputBox> {
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: widget.isInVoiceMode
-                              ? Colors.greenAccent
+                              ? ThemeProvider.themeOf(context).id == "light_theme" ? Colors.green[600]! : Colors.greenAccent
                               : Theme.of(context)
                                   .iconTheme
                                   .color!
@@ -143,7 +143,7 @@ class _InputBoxState extends State<InputBox> {
                           Icon(
                             widget.isInVoiceMode ? Icons.mic : Icons.mic_off,
                             color: widget.isInVoiceMode
-                                ? Colors.greenAccent
+                                ? ThemeProvider.themeOf(context).id == "light_theme" ? Colors.green[600]! : Colors.greenAccent
                                 : Theme.of(context).iconTheme.color,
                             size: 18.0,
                           ),
@@ -152,7 +152,7 @@ class _InputBoxState extends State<InputBox> {
                             'Voice Mode',
                             style: TextStyle(
                               color: widget.isInVoiceMode
-                                  ? Colors.greenAccent
+                                  ? ThemeProvider.themeOf(context).id == "light_theme" ? Colors.green[600]! : Colors.greenAccent
                                   : Theme.of(context).iconTheme.color,
                             ),
                           )
@@ -176,7 +176,7 @@ class _InputBoxState extends State<InputBox> {
                             : Icons.mic,
                         color: widget.speechToText.isNotListening
                             ? Theme.of(context).iconTheme.color
-                            : Colors.greenAccent,
+                            : ThemeProvider.themeOf(context).id == "light_theme" ? Colors.green[600] : Colors.greenAccent,
                       ),
                     )
                   : IconButton(
