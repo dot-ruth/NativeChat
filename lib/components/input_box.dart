@@ -1,6 +1,7 @@
 // dart
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 class InputBox extends StatefulWidget {
   const InputBox({
@@ -49,7 +50,7 @@ class _InputBoxState extends State<InputBox> {
           topLeft: Radius.circular(20.0),
           topRight: Radius.circular(20.0),
         ),
-        color: const Color(0xff1a1a1a),
+        color: ThemeProvider.themeOf(context).id == "light_theme" ? const Color(0xfff2f2f2) : const Color(0xff1a1a1a)
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,13 +62,13 @@ class _InputBoxState extends State<InputBox> {
                     Expanded(
                       child: TextField(
                         controller: widget.userMessageController,
-                        cursorColor: Colors.white,
-                        style: const TextStyle(color: Colors.white),
+                        cursorColor: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white,
+                        style: TextStyle(color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white),
                         minLines: 1,
                         maxLines: 5,
                         decoration: InputDecoration(
                           hintText: "ask about anything...",
-                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          hintStyle: TextStyle(color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.grey[500]),
                           border: InputBorder.none,
                         ),
                       ),

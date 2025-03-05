@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:theme_provider/theme_provider.dart";
 
 class UserInput extends StatefulWidget {
   const UserInput({
@@ -40,7 +41,7 @@ class _UserInputState extends State<UserInput> {
             decoration: widget.isOneSidedChatMode
                 ? null
                 : BoxDecoration(
-                    color: Colors.grey[900]!,
+                    color: ThemeProvider.themeOf(context).id == "light_theme" ? const Color(0xfff2f2f2) :  Colors.grey[900]!,
                     borderRadius: BorderRadius.circular(100.0),
                   ),
             padding: widget.isOneSidedChatMode
@@ -52,7 +53,7 @@ class _UserInputState extends State<UserInput> {
                   ? TextAlign.left
                   : TextAlign.right,
               style: TextStyle(
-                color: Colors.white,
+                color:ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.white
               ),
             ),
           ),
