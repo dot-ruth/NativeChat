@@ -32,7 +32,7 @@ class _HomeAppbarState extends State<HomeAppbar> {
         IconButton(
           onPressed: widget.toggleAPIKey,
           icon: Icon(
-            Ionicons.key_sharp,
+            Ionicons.key_outline,
             size: 18.0,
             color: Theme.of(context).iconTheme.color,
           ),
@@ -40,15 +40,16 @@ class _HomeAppbarState extends State<HomeAppbar> {
 
         //Change Theme
         IconButton(
-            onPressed: () {
-              ThemeProvider.controllerOf(context).nextTheme();
-            },
-            icon: Icon(
-              ThemeProvider.themeOf(context).id == "light_theme" ? Icons.dark_mode_outlined : Icons.wb_sunny_outlined,
+          onPressed: () {
+            ThemeProvider.controllerOf(context).nextTheme();
+          },
+          icon: Icon(
+              ThemeProvider.themeOf(context).id == "light_theme"
+                  ? Icons.dark_mode_outlined
+                  : Icons.wb_sunny_outlined,
               size: 20.0,
-              color: Theme.of(context).iconTheme.color
-            ),
-          ),
+              color: Theme.of(context).iconTheme.color),
+        ),
 
         // Change chat layout
         IconButton(
@@ -66,7 +67,7 @@ class _HomeAppbarState extends State<HomeAppbar> {
         IconButton(
           onPressed: widget.clearConversation,
           icon: Icon(
-            Ionicons.trash_sharp,
+            Ionicons.trash_outline,
             size: 18.0,
             color: Theme.of(context).iconTheme.color,
           ),

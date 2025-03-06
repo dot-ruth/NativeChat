@@ -1,9 +1,9 @@
 // dart
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nativechat/components/ai_response.dart';
 import 'package:nativechat/components/chat_image_container.dart';
+import 'package:nativechat/components/circle_dot.dart';
+import 'package:nativechat/components/circle_loading_animation.dart';
 import 'package:nativechat/components/system_response.dart';
 import 'package:nativechat/components/user_input.dart';
 
@@ -55,23 +55,11 @@ class _ConversationFeedState extends State<ConversationFeed> {
                       ),
                       chat["isError"] == true
                           ? isLast == true
-                              ? Container(
-                                  alignment: Alignment.centerLeft,
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Icon(
-                                    Ionicons.ellipse,
-                                    size: 18.0,
-                                    color: Colors.grey[900],
-                                  ),
+                              ? CircleDot(
+                                  leftPadding: 16.0,
                                 )
                               : Container()
-                          : Container(
-                              padding: const EdgeInsets.only(left: 18.0),
-                              child: LoadingAnimationWidget.beat(
-                                color: Colors.grey[600]!,
-                                size: 14,
-                              ),
-                            ),
+                          : CircleLoadingAnimation()
                     ],
                   );
           } else if (isUser) {

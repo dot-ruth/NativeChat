@@ -31,17 +31,21 @@ class _CodeblockState extends State<Codeblock> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: ThemeProvider.themeOf(context).id == "light_theme" ? const Color(0xfff2f2f2) :  Color(0xff121212),
+      color: ThemeProvider.themeOf(context).id == "light_theme"
+          ? const Color(0xfff2f2f2)
+          : Color(0xff121212),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Name and Copy Button
+          // Name, Copy and Fold Button
           Container(
             decoration: BoxDecoration(
-              color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.grey[300] :  Color(0xff151515),
+              color: ThemeProvider.themeOf(context).id == "light_theme"
+                  ? Colors.grey[300]
+                  : Color(0xff151515),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(10.0),
                 topRight: Radius.circular(10.0),
@@ -59,8 +63,9 @@ class _CodeblockState extends State<Codeblock> {
                 Text(
                   widget.name,
                   style: TextStyle(
-                    color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black :  Colors.grey[700]
-                  ),
+                      color: ThemeProvider.themeOf(context).id == "light_theme"
+                          ? Colors.black
+                          : Colors.grey[700]),
                 ),
                 const Spacer(),
                 GestureDetector(
@@ -68,8 +73,13 @@ class _CodeblockState extends State<Codeblock> {
                   child: Icon(
                     (_copied) ? Icons.done : Icons.content_paste,
                     size: 15,
-                    color: (_copied) ? ThemeProvider.themeOf(context).id == "light_theme" ? Colors.green[600] : Colors.greenAccent 
-                    :ThemeProvider.themeOf(context).id == "light_theme"? Colors.grey[700]:Colors.grey[500],
+                    color: (_copied)
+                        ? ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.green[600]
+                            : Colors.greenAccent
+                        : ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.grey[700]
+                            : Colors.grey[500],
                   ),
                 ),
                 GestureDetector(
@@ -83,22 +93,26 @@ class _CodeblockState extends State<Codeblock> {
                         ? Icons.arrow_downward_outlined
                         : Icons.arrow_upward_outlined,
                     size: 18,
-                    color: (_collapse) ? ThemeProvider.themeOf(context).id == "light_theme" ? Colors.green[600] : Colors.greenAccent 
-                    : ThemeProvider.themeOf(context).id == "light_theme"? Colors.grey[700]:Colors.grey[500],
+                    color: (_collapse)
+                        ? ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.green[600]
+                            : Colors.greenAccent
+                        : ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.grey[700]
+                            : Colors.grey[500],
                   ),
                 )
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            color:ThemeProvider.themeOf(context).id == "light_theme"? Colors.grey[300]:Colors.grey[900],
-          ),
 
           // Code
           Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
             decoration: BoxDecoration(
-              color: ThemeProvider.themeOf(context).id == "light_theme" ? const Color(0xfff2f2f2) :  Colors.grey[900]!,
+              color: ThemeProvider.themeOf(context).id == "light_theme"
+                  ? const Color(0xfff2f2f2)
+                  : Color(0xff0e0e0e),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(10.0),
                 bottomRight: Radius.circular(10.0),
@@ -109,13 +123,15 @@ class _CodeblockState extends State<Codeblock> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(10),
               child: Text(
-                  widget.code,
-                  maxLines: _collapse ? 5 : null,
-                  style: TextStyle(
-                    color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black :  Colors.grey[400],
-                    // fontFamily: 'monospace',
-                  ),
+                widget.code,
+                maxLines: _collapse ? 5 : null,
+                style: TextStyle(
+                  color: ThemeProvider.themeOf(context).id == "light_theme"
+                      ? Colors.black
+                      : Colors.grey[400],
+                  // fontFamily: 'monospace',
                 ),
+              ),
             ),
           ),
         ],

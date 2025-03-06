@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
+import 'package:nativechat/components/circle_dot.dart';
 import 'package:nativechat/constants/constants.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -55,54 +55,52 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
               onTap: () {
                 enterPromptSuggestion(randomPromptSuggestions[index]);
               },
-              child: Builder(
-                builder: (context) {
-                  return Column(
-                    crossAxisAlignment: widget.isOneSidedChatMode
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.center,
-                    children: [
-                           Text(
-                            randomPromptSuggestions[index],
-                            style: TextStyle(
-                              color: ThemeProvider.themeOf(context).id == "light_theme"? Colors.grey[800]! : Colors.grey[400]!,
-                            ),
-                          ),
-                      Container(
-                        height: 25.0,
-                        margin: const EdgeInsets.only(left: 12.0),
-                        decoration: widget.isOneSidedChatMode
-                            ? BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(color: ThemeProvider.themeOf(context).id == "light_theme"? Colors.grey[300]! : Colors.grey[900]!),
-                                ),
-                              )
-                            : BoxDecoration(),
+              child: Builder(builder: (context) {
+                return Column(
+                  crossAxisAlignment: widget.isOneSidedChatMode
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      randomPromptSuggestions[index],
+                      style: TextStyle(
+                        color:
+                            ThemeProvider.themeOf(context).id == "light_theme"
+                                ? Colors.grey[900]!
+                                : Colors.grey[400]!,
                       ),
-                      index == randomPromptSuggestions.length - 1
-                          ? Row(
-                              mainAxisAlignment: widget.isOneSidedChatMode
-                                  ? MainAxisAlignment.start
-                                  : MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  padding: const EdgeInsets.only(
-                                    left: 4.0,
-                                  ),
-                                  child: Icon(
-                                    Ionicons.ellipse,
-                                    size: 18.0,
-                                    color: Colors.grey[800],
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Container(),
-                    ],
-                  );
-                }
-              ),
+                    ),
+                    SizedBox(height: 25.0),
+                    // Container(
+                    //   height: 25.0,
+                    //   margin: const EdgeInsets.only(left: 12.0),
+                    //   decoration: widget.isOneSidedChatMode
+                    //       ? BoxDecoration(
+                    //           border: Border(
+                    //             left: BorderSide(
+                    //                 color: ThemeProvider.themeOf(context).id ==
+                    //                         "light_theme"
+                    //                     ? Colors.grey[300]!
+                    //                     : Colors.grey[900]!),
+                    //           ),
+                    //         )
+                    //       : BoxDecoration(),
+                    // ),
+                    index == randomPromptSuggestions.length - 1
+                        ? Row(
+                            mainAxisAlignment: widget.isOneSidedChatMode
+                                ? MainAxisAlignment.start
+                                : MainAxisAlignment.center,
+                            children: [
+                              CircleDot(
+                                leftPadding: 4.0,
+                              )
+                            ],
+                          )
+                        : Container(),
+                  ],
+                );
+              }),
             );
           },
         ),

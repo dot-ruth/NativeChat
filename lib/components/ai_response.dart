@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:gpt_markdown/gpt_markdown.dart";
-import "package:ionicons/ionicons.dart";
+import "package:nativechat/components/circle_dot.dart";
 import "package:nativechat/components/codeblock.dart";
 import "package:nativechat/components/dashed_border_exracted.dart";
 import "package:theme_provider/theme_provider.dart";
@@ -51,26 +51,15 @@ class _AIResponseState extends State<AIResponse> {
             child: GptMarkdown(
               widget.text,
               style: TextStyle(
-                color: ThemeProvider.themeOf(context).id == "light_theme" ? Colors.black : Colors.grey[400]
-              ),
+                  color: ThemeProvider.themeOf(context).id == "light_theme"
+                      ? Colors.black
+                      : Colors.grey[400]),
               codeBuilder: (context, name, code, closed) =>
                   Codeblock(code: code, name: name),
             ),
           ),
         ),
-        widget.isLast == true
-            ? Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.only(
-                  left: 16.0,
-                ),
-                child: Icon(
-                  Ionicons.ellipse,
-                  size: 18.0,
-                  color: Colors.grey[800],
-                ),
-              )
-            : Container(),
+        widget.isLast == true ? CircleDot(leftPadding: 16.0) : Container(),
       ],
     );
   }

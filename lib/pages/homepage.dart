@@ -30,7 +30,7 @@ class _HomepageState extends State<Homepage> {
   ScrollController scrollController = ScrollController();
   late GenerativeModel model;
   var chatHistory = [];
-  bool _loading = false;
+  bool isSendingImageFilePrompt = false;
   var installedAppsString = '';
   var installedAppsLength = 0;
   Uint8List? attachedImageBytes;
@@ -38,7 +38,7 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> _sendImageFilePrompt() async {
     setState(() {
-      _loading = true;
+      isSendingImageFilePrompt = true;
     });
     try {
       // Pick an image file.
@@ -48,7 +48,7 @@ class _HomepageState extends State<Homepage> {
       );
       if (result == null || result.files.isEmpty) {
         setState(() {
-          _loading = false;
+          isSendingImageFilePrompt = false;
         });
         return;
       }
@@ -63,11 +63,11 @@ class _HomepageState extends State<Homepage> {
           "content": "",
           "image": attachedImageBytes,
         });
-        _loading = false;
+        isSendingImageFilePrompt = false;
       });
     } catch (e) {
       setState(() {
-        _loading = false;
+        isSendingImageFilePrompt = false;
       });
       // Handle error as needed.
     }
