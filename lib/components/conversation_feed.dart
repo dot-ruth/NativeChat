@@ -51,7 +51,7 @@ class _ConversationFeedState extends State<ConversationFeed> {
                   ChatImageContainer(
                     isOneSidedChatMode: widget.isOneSidedChatMode,
                     image: fileData['bytes'],
-                    prompt: "",
+
                   ),
                   if ((chat['content'] as String).trim().isNotEmpty)
                     Padding(
@@ -160,7 +160,7 @@ class _ConversationFeedState extends State<ConversationFeed> {
                 ChatImageContainer(
                   isOneSidedChatMode: widget.isOneSidedChatMode,
                   image: chat['image'],
-                  prompt: "",
+
                 ),
                 if ((chat['content'] as String).trim().isNotEmpty)
                   Padding(
@@ -170,12 +170,9 @@ class _ConversationFeedState extends State<ConversationFeed> {
                       alignment: widget.isOneSidedChatMode
                           ? Alignment.centerLeft
                           : Alignment.centerRight,
-                      child: Text(
-                        chat['content'] ?? "",
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                        ),
+                      child: UserInput(
+                        text: chat['content'] ?? "",
+                          isOneSidedChatMode: widget.isOneSidedChatMode,
                       ),
                     ),
                   ),

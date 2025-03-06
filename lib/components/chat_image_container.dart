@@ -3,18 +3,17 @@
 import 'dart:typed_data';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
-import 'package:nativechat/components/user_input.dart';
+
 
 class ChatImageContainer extends StatefulWidget {
   final bool isOneSidedChatMode;
   final Uint8List image;
-  final String prompt;
 
   const ChatImageContainer({
     super.key,
     required this.isOneSidedChatMode,
     required this.image,
-    this.prompt = "",
+
   });
 
   @override
@@ -53,11 +52,6 @@ class _ChatImageContainerState extends State<ChatImageContainer> {
                     height: 200,
                   ),
 
-                  if (widget.prompt.trim().isNotEmpty)
-                    UserInput(
-                      text: widget.prompt,
-                      isOneSidedChatMode: widget.isOneSidedChatMode,
-                    ),
                 ],
               ),
             ),
