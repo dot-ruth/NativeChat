@@ -1,13 +1,17 @@
 // dart
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:nativechat/components/attach_file_pop.dart';
 
 class InputBox extends StatefulWidget {
   const InputBox({
     super.key,
     required this.summarizeText,
     required this.chatWithAI,
-    required this.attachFile,
+    required this.onPickFile,
+    required this.onPickImage,
+    required this.onPickAudio,
+    required this.onPickCamera,
     required this.isSummarizeInContext,
     required this.userMessageController,
     required this.toggleVoiceMode,
@@ -19,7 +23,10 @@ class InputBox extends StatefulWidget {
 
   final Function summarizeText;
   final Function chatWithAI;
-  final Function attachFile; // New
+  final VoidCallback onPickFile;
+  final VoidCallback onPickImage;
+  final VoidCallback onPickAudio;
+  final VoidCallback onPickCamera;
   final bool isSummarizeInContext;
   final TextEditingController userMessageController;
   final Function toggleVoiceMode;
@@ -33,8 +40,6 @@ class InputBox extends StatefulWidget {
 }
 
 class _InputBoxState extends State<InputBox> {
-  bool isVoiceMode = false;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,23 +62,23 @@ class _InputBoxState extends State<InputBox> {
           widget.isInVoiceMode
               ? Container()
               : Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: widget.userMessageController,
-                        cursorColor: Colors.white,
-                        style: const TextStyle(color: Colors.white),
-                        minLines: 1,
-                        maxLines: 5,
-                        decoration: InputDecoration(
-                          hintText: "ask about anything...",
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ],
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: widget.userMessageController,
+                  cursorColor: Colors.white,
+                  style: const TextStyle(color: Colors.white),
+                  minLines: 1,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    hintText: "ask about anything...",
+                    hintStyle: TextStyle(color: Colors.grey[500]),
+                    border: InputBorder.none,
+                  ),
                 ),
+              ),
+            ],
+          ),
           const SizedBox(height: 12.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -81,42 +86,15 @@ class _InputBoxState extends State<InputBox> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      widget.attachFile();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15.0,
-                        vertical: 6.0,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color:
-                              Theme.of(context).iconTheme.color!.withAlpha(100),
-                        ),
-                        borderRadius: BorderRadius.circular(100.0),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.attach_file_outlined,
-                            color: Theme.of(context).iconTheme.color,
-                            size: 18.0,
-                          ),
-                          const SizedBox(width: 4.0),
-                          Text(
-                            'Attach File',
-                            style: TextStyle(
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                  // Replace the previous gesture detector with AttachFilePopup.
+                  AttachFilePopup(
+                    onPickFile: widget.onPickFile,
+                    onPickImage: widget.onPickImage,
+                    onPickAudio: widget.onPickAudio,
+                    onPickCamera: widget.onPickCamera,
                   ),
                   const SizedBox(width: 10.0),
-                  // Voice Mode
+                  // Voice Mode Button
                   GestureDetector(
                     onTap: () {
                       widget.toggleVoiceMode();
@@ -130,10 +108,7 @@ class _InputBoxState extends State<InputBox> {
                         border: Border.all(
                           color: widget.isInVoiceMode
                               ? Colors.greenAccent
-                              : Theme.of(context)
-                                  .iconTheme
-                                  .color!
-                                  .withAlpha(100),
+                              : Theme.of(context).iconTheme.color!.withAlpha(100),
                         ),
                         borderRadius: BorderRadius.circular(100.0),
                       ),
@@ -164,31 +139,29 @@ class _InputBoxState extends State<InputBox> {
               // Send and Mic Button
               widget.isInVoiceMode
                   ? IconButton(
-                      onPressed: () {
-                        widget.speechToText.isNotListening
-                            ? widget.startListening()
-                            : widget.stopListening();
-                      },
-                      icon: Icon(
-                        widget.speechToText.isNotListening
-                            ? Icons.mic_off
-                            : Icons.mic,
-                        color: widget.speechToText.isNotListening
-                            ? Theme.of(context).iconTheme.color
-                            : Colors.greenAccent,
-                      ),
-                    )
+                onPressed: () {
+                  widget.speechToText.isNotListening
+                      ? widget.startListening()
+                      : widget.stopListening();
+                },
+                icon: Icon(
+                  widget.speechToText.isNotListening ? Icons.mic_off : Icons.mic,
+                  color: widget.speechToText.isNotListening
+                      ? Theme.of(context).iconTheme.color
+                      : Colors.greenAccent,
+                ),
+              )
                   : IconButton(
-                      onPressed: () {
-                        widget.isSummarizeInContext
-                            ? widget.summarizeText(fromUserInput: true)
-                            : widget.chatWithAI();
-                      },
-                      icon: Icon(
-                        Icons.send,
-                        color: Theme.of(context).iconTheme.color,
-                      ),
-                    ),
+                onPressed: () {
+                  widget.isSummarizeInContext
+                      ? widget.summarizeText(fromUserInput: true)
+                      : widget.chatWithAI();
+                },
+                icon: Icon(
+                  Icons.send,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+              ),
             ],
           ),
         ],

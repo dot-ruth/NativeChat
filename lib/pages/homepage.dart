@@ -7,6 +7,7 @@ import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:hive/hive.dart';
 import 'package:nativechat/components/apikey_input.dart';
+import 'package:nativechat/components/attachment_preview.dart';
 import 'package:nativechat/components/conversation_feed.dart';
 import 'package:nativechat/components/home_appbar.dart';
 import 'package:nativechat/components/input_box.dart';
@@ -19,7 +20,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../components/attachment_picker.dart';
+import '../components/attach_file_pop.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -31,6 +32,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   TextEditingController userMessageController = TextEditingController();
   ScrollController scrollController = ScrollController();
+
   late GenerativeModel model;
   var chatHistory = [];
   bool _loading = false;
@@ -40,16 +42,7 @@ class _HomepageState extends State<Homepage> {
   Uint8List? attachedImageBytes;
   Uint8List? attachedFileBytes;
   String? attachedMime;
-  void _toggleAttachmentOptions() {
-    setState(() {
-      _showingAttachmentOptions = !_showingAttachmentOptions;
-    });
-  }
-
-// Updated chatWithAI method to check for attached image data.
-// If present, compose a multi-part message using both prompt and image.
-
-
+String? attachedFileName;
   void addUserInputToChatHistory(userInput) {
     setState(() {
       chatHistory.add({
@@ -296,7 +289,7 @@ class _HomepageState extends State<Homepage> {
     final imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
     return imageExtensions.contains(extension.toLowerCase());
   }
-// dart
+
   Future<void> _pickFile() async {
     setState(() {
       _loading = true;
@@ -312,10 +305,11 @@ class _HomepageState extends State<Homepage> {
         return;
       }
       final file = result.files.first;
+      attachedFileName = file.name;
+      // Use _isImageFile to confirm if the file is an image.
       setState(() {
-        // Only update attachment state, do not add to chatHistory
         attachedFileBytes = file.bytes;
-        attachedMime = _determineMimeType(file.extension);
+        attachedMime =  _determineMimeType(file.extension) ;
         _loading = false;
       });
     } catch (e) {
@@ -370,6 +364,7 @@ class _HomepageState extends State<Homepage> {
         return;
       }
       final file = result.files.first;
+      attachedFileName = file.name;
       attachedFileBytes = file.bytes;
       // Set MIME type based on extension.
       if (file.extension?.toLowerCase() == 'mp3') {
@@ -415,7 +410,8 @@ class _HomepageState extends State<Homepage> {
       });
     }
   }
-// dart
+
+
   void chatWithAI() async {
     final userInput = userMessageController.text.trim();
     if (userInput.isEmpty && attachedFileBytes == null && attachedImageBytes == null) {
@@ -423,7 +419,6 @@ class _HomepageState extends State<Homepage> {
       return;
     }
 
-    // Clear the text field before processing.
     userMessageController.clear();
     final Map<String, dynamic> message = {
       "from": "user",
@@ -434,6 +429,7 @@ class _HomepageState extends State<Homepage> {
     // Check if an attachment exists.
     if ((attachedFileBytes != null || attachedImageBytes != null) && attachedMime != null) {
       Uint8List attachmentData = attachedFileBytes ?? attachedImageBytes!;
+
       // Create a multi-part message.
       content = Content.multi([
         TextPart(userInput),
@@ -445,7 +441,7 @@ class _HomepageState extends State<Homepage> {
         message["image"] = attachedImageBytes;
       } else {
         message["file"] = {
-          "name": "File",
+          "name": attachedFileName,
           "bytes": attachmentData,
           "mime": attachedMime,
           "isAudio": attachedMime!.startsWith('audio/'),
@@ -487,6 +483,7 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+// dart
   String _determineMimeType(String? extension) {
     if (extension == null) return 'application/octet-stream';
 
@@ -501,8 +498,21 @@ class _HomepageState extends State<Homepage> {
       case 'pdf':
         return 'application/pdf';
       case 'doc':
-      case 'docx':
         return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'ppt':
+        return 'application/vnd.ms-powerpoint';
+      case 'pptx':
+        return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      case 'xls':
+        return 'application/vnd.ms-excel';
+      case 'xlsx':
+        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      case 'txt':
+        return 'text/plain';
+      case 'csv':
+        return 'text/csv';
       case 'mp3':
         return 'audio/mpeg';
       case 'm4a':
@@ -556,114 +566,6 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-// dart
-  Widget _buildAttachmentPreview() {
-    // Check for file or image bytes
-    final Uint8List? previewBytes = attachedFileBytes ?? attachedImageBytes;
-    if (previewBytes == null) return const SizedBox.shrink();
-
-    final bool isImage = attachedMime != null && attachedMime!.startsWith('image/');
-    final bool isAudio = attachedMime != null && attachedMime!.startsWith('audio/');
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12.0),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-                  Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8.0,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: isImage
-                ? ClipRRect(
-              borderRadius: BorderRadius.circular(12.0),
-              child: Image.memory(
-                previewBytes,
-                height: 100,
-                fit: BoxFit.fitHeight,
-              ),
-            )
-                : isAudio
-                ? Row(
-              children: [
-                Icon(
-                  Icons.audiotrack,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 32.0,
-                ),
-                const SizedBox(width: 16.0),
-                Expanded(
-                  child: Text(
-                    "Audio File Attached",
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                  ),
-                ),
-              ],
-            )
-                : Row(
-              children: [
-                Icon(
-                  Icons.insert_drive_file_rounded,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 32.0,
-                ),
-                const SizedBox(width: 16.0),
-                Expanded(
-                  child: Text(
-                    "Preview File",
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 4.0,
-            right: 4.0,
-            child: InkWell(
-              onTap: removeAttachment,
-              borderRadius: BorderRadius.circular(20.0),
-              child: Container(
-                padding: const EdgeInsets.all(4.0),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black45,
-                ),
-                child: const Icon(
-                  Icons.close,
-                  size: 18.0,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   void initializations() async {
     // Clear Chat
@@ -750,7 +652,7 @@ class _HomepageState extends State<Homepage> {
             children: [
               if (_showingAttachmentOptions)
               // In your _HomepageState class build method
-                AttachmentPicker(
+                AttachFilePopup(
                   onPickFile: () {
                     _pickFile();
                     setState(() {
@@ -776,15 +678,32 @@ class _HomepageState extends State<Homepage> {
                     });
                   },
                 ),
-              _buildAttachmentPreview(),
+              AttachmentPreview(
+                  attachedFileBytes: attachedFileBytes,
+                  attachedImageBytes: attachedImageBytes,
+                  attachedMime: attachedMime,
+                  attachedFileName: attachedFileName,
+                  removeAttachment: removeAttachment),
               isAddingAPIKey == true
                   ? APIKeyInput(
                 getSettings: getSettings,
               )
                   : InputBox(
-                attachFile: _toggleAttachmentOptions,
-                summarizeText: summarizeText,
                 chatWithAI: chatWithAI,
+                onPickFile: () {
+                  _pickFile();
+                },
+                onPickImage: () {
+                  _pickImageFromGallery();
+                },
+                onPickAudio: () {
+                  _pickAudioFile();
+                },
+                onPickCamera: () {
+                  _captureImageFromCamera();
+                },
+
+                summarizeText: summarizeText,
                 isSummarizeInContext: isSummarizeInContext,
                 userMessageController: userMessageController,
                 startListening: startListening,
