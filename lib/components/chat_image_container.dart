@@ -1,19 +1,21 @@
 // dart
+// File: lib/components/chat_image_container.dart
 import 'dart:typed_data';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:nativechat/components/user_input.dart';
 
 class ChatImageContainer extends StatefulWidget {
   final bool isOneSidedChatMode;
   final Uint8List image;
-  final String prompt; // New prompt parameter
+  final String prompt;
 
   const ChatImageContainer({
-    Key? key,
+    super.key,
     required this.isOneSidedChatMode,
     required this.image,
     this.prompt = "",
-  }) : super(key: key);
+  });
 
   @override
   State<ChatImageContainer> createState() => _ChatImageContainerState();
@@ -28,9 +30,7 @@ class _ChatImageContainerState extends State<ChatImageContainer> {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: widget.isOneSidedChatMode
-          ? Alignment.centerLeft
-          : Alignment.centerRight,
+      alignment: widget.isOneSidedChatMode ? Alignment.centerLeft : Alignment.centerRight,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
         child: ConstrainedBox(
@@ -52,18 +52,11 @@ class _ChatImageContainerState extends State<ChatImageContainer> {
                     fit: BoxFit.cover,
                     height: 200,
                   ),
-                  // Display the prompt if exists
+
                   if (widget.prompt.trim().isNotEmpty)
-                    Padding(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
-                      child: Text(
-                        widget.prompt,
-                        style: TextStyle(
-                          color: Colors.grey[900],
-                          fontSize: 16.0,
-                        ),
-                      ),
+                    UserInput(
+                      text: widget.prompt,
+                      isOneSidedChatMode: widget.isOneSidedChatMode,
                     ),
                 ],
               ),
