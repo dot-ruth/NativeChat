@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 class Codeblock extends StatefulWidget {
   const Codeblock({super.key, required this.code, required this.name});
@@ -30,19 +31,24 @@ class _CodeblockState extends State<Codeblock> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Color(0xff121212),
+      color: ThemeProvider.themeOf(context).id == "light_theme"
+          ? const Color(0xfff2f2f2)
+          : Color(0xff121212),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Name and Copy Button
+          // Name, Copy and Fold Button
           Container(
             decoration: BoxDecoration(
-              color: Color(0xff151515),
-              borderRadius: BorderRadius.circular(
-                10.0,
+              color: ThemeProvider.themeOf(context).id == "light_theme"
+                  ? Colors.grey[300]
+                  : Color(0xff151515),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10.0),
+                topRight: Radius.circular(10.0),
               ),
             ),
             padding: const EdgeInsets.only(
@@ -57,8 +63,9 @@ class _CodeblockState extends State<Codeblock> {
                 Text(
                   widget.name,
                   style: TextStyle(
-                    color: Colors.grey[700],
-                  ),
+                      color: ThemeProvider.themeOf(context).id == "light_theme"
+                          ? Colors.black
+                          : Colors.grey[700]),
                 ),
                 const Spacer(),
                 GestureDetector(
@@ -66,7 +73,13 @@ class _CodeblockState extends State<Codeblock> {
                   child: Icon(
                     (_copied) ? Icons.done : Icons.content_paste,
                     size: 15,
-                    color: (_copied) ? Colors.greenAccent : Colors.grey[500],
+                    color: (_copied)
+                        ? ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.green[600]
+                            : Colors.greenAccent
+                        : ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.grey[700]
+                            : Colors.grey[500],
                   ),
                 ),
                 GestureDetector(
@@ -79,28 +92,45 @@ class _CodeblockState extends State<Codeblock> {
                     (_collapse)
                         ? Icons.arrow_downward_outlined
                         : Icons.arrow_upward_outlined,
-                    size: 15,
-                    color: (_collapse) ? Colors.greenAccent : Colors.grey[500],
+                    size: 18,
+                    color: (_collapse)
+                        ? ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.green[600]
+                            : Colors.greenAccent
+                        : ThemeProvider.themeOf(context).id == "light_theme"
+                            ? Colors.grey[700]
+                            : Colors.grey[500],
                   ),
                 )
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            color: Colors.grey[900]!,
-          ),
 
           // Code
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(10),
-            child: Text(
-              widget.code,
-              maxLines: _collapse ? 5 : null,
-              style: TextStyle(
-                color: Colors.grey[400],
-                // fontFamily: 'monospace',
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            decoration: BoxDecoration(
+              color: ThemeProvider.themeOf(context).id == "light_theme"
+                  ? const Color(0xfff2f2f2)
+                  : Color(0xff0e0e0e),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10.0),
+                bottomRight: Radius.circular(10.0),
+              ),
+            ),
+            //color: ThemeProvider.themeOf(context).id == "light_theme" ? const Color(0xfff2f2f2) :  Colors.grey[900]!,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                widget.code,
+                maxLines: _collapse ? 5 : null,
+                style: TextStyle(
+                  color: ThemeProvider.themeOf(context).id == "light_theme"
+                      ? Colors.black
+                      : Colors.grey[400],
+                  // fontFamily: 'monospace',
+                ),
               ),
             ),
           ),

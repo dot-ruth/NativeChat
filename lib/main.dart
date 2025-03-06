@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:nativechat/models/settings.dart';
+import 'package:theme_provider/theme_provider.dart';
 // import 'package:flutter/services.dart';
 
 import 'pages/homepage.dart';
@@ -36,20 +37,67 @@ class _MyAppState extends State<MyApp> {
     //   overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
     // );
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: "/",
-      routes: {"/": (context) => const Homepage()},
-      theme: ThemeData(
-        scaffoldBackgroundColor: darkGreyColor,
-        appBarTheme: AppBarTheme(
-          backgroundColor: darkGreyColor,
-          iconTheme: IconThemeData(
-            color: Colors.grey[800],
+    // return MaterialApp(
+    //   debugShowCheckedModeBanner: false,
+    //   initialRoute: "/",
+    //   routes: {"/": (context) => const Homepage()},
+    //   theme: ThemeData(
+    //     scaffoldBackgroundColor: darkGreyColor,
+    //     appBarTheme: AppBarTheme(
+    //       backgroundColor: darkGreyColor,
+    //       iconTheme: IconThemeData(
+    //         color: Colors.grey[800],
+    //       ),
+    //     ),
+    //     iconTheme: IconThemeData(
+    //       color: Colors.grey[500]!,
+    //     ),
+    //   ),
+    // );
+
+    return ThemeProvider(
+      saveThemesOnChange: true,
+      defaultThemeId: "dark_theme",
+      themes: [
+        AppTheme(
+          id: "light_theme",
+          description: "light_theme",
+          data: ThemeData(
+            primaryColor: Colors.white,
+            scaffoldBackgroundColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+            ),
+            iconTheme: const IconThemeData(
+              color: Colors.black,
+            ),
           ),
         ),
-        iconTheme: IconThemeData(
-          color: Colors.grey[500]!,
+        AppTheme(
+          id: "dark_theme",
+          description: "dark_theme",
+          data: ThemeData(
+            primaryColor: Colors.black,
+            scaffoldBackgroundColor: darkGreyColor,
+            appBarTheme: AppBarTheme(
+              backgroundColor: darkGreyColor,
+            ),
+            iconTheme: IconThemeData(
+              color: Colors.grey[500],
+            ),
+          ),
+        ),
+      ],
+      child: ThemeConsumer(
+        child: Builder(
+          builder: (themeContext) => MaterialApp(
+            theme: ThemeProvider.themeOf(themeContext).data,
+            debugShowCheckedModeBanner: false,
+            initialRoute: "/",
+            routes: {
+              "/": (context) => const Homepage(),
+            },
+          ),
         ),
       ),
     );
