@@ -1,4 +1,4 @@
-// dart
+// File: lib/components/input_box.dart
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:nativechat/components/attach_file_pop.dart';
@@ -42,6 +42,16 @@ class InputBox extends StatefulWidget {
 class _InputBoxState extends State<InputBox> {
   @override
   Widget build(BuildContext context) {
+    final Color backgroundColor =
+        Theme.of(context).inputDecorationTheme.fillColor ??
+            Theme.of(context).scaffoldBackgroundColor;
+    final TextStyle textFieldStyle = Theme.of(context).textTheme.bodyLarge ??
+        const TextStyle(color: Colors.white);
+    final TextStyle hintStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      color: Theme.of(context).iconTheme.color,
+    ) ??
+        TextStyle(color: Theme.of(context).iconTheme.color!);
+
     return Container(
       padding: const EdgeInsets.only(
         left: 18.0,
@@ -50,30 +60,32 @@ class _InputBoxState extends State<InputBox> {
         bottom: 10.0,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20.0),
           topRight: Radius.circular(20.0),
         ),
-        color: const Color(0xff1a1a1a),
+        color: backgroundColor,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           widget.isInVoiceMode
-              ? Container()
+              ? const SizedBox.shrink()
               : Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: widget.userMessageController,
-                  cursorColor: Colors.white,
-                  style: const TextStyle(color: Colors.white),
+                  cursorColor: Theme.of(context).iconTheme.color,
+                  style: textFieldStyle,
                   minLines: 1,
                   maxLines: 5,
                   decoration: InputDecoration(
                     hintText: "ask about anything...",
-                    hintStyle: TextStyle(color: Colors.grey[500]),
+                    hintStyle: hintStyle,
                     border: InputBorder.none,
+                    filled: true,
+                    fillColor: backgroundColor,
                   ),
                 ),
               ),
@@ -81,62 +93,55 @@ class _InputBoxState extends State<InputBox> {
           ),
           const SizedBox(height: 12.0),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // Replace the previous gesture detector with AttachFilePopup.
-                  AttachFilePopup(
-                    onPickFile: widget.onPickFile,
-                    onPickImage: widget.onPickImage,
-                    onPickAudio: widget.onPickAudio,
-                    onPickCamera: widget.onPickCamera,
+              AttachFilePopup(
+                onPickFile: widget.onPickFile,
+                onPickImage: widget.onPickImage,
+                onPickAudio: widget.onPickAudio,
+                onPickCamera: widget.onPickCamera,
+              ),
+              const SizedBox(width: 10.0),
+              GestureDetector(
+                onTap: () {
+                  widget.toggleVoiceMode();
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15.0,
+                    vertical: 6.0,
                   ),
-                  const SizedBox(width: 10.0),
-                  // Voice Mode Button
-                  GestureDetector(
-                    onTap: () {
-                      widget.toggleVoiceMode();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15.0,
-                        vertical: 6.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: widget.isInVoiceMode
+                          ? Colors.greenAccent
+                          : Theme.of(context).iconTheme.color!.withAlpha(100),
+                    ),
+                    borderRadius: BorderRadius.circular(100.0),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        widget.isInVoiceMode ? Icons.mic : Icons.mic_off,
+                        color: widget.isInVoiceMode
+                            ? Colors.greenAccent
+                            : Theme.of(context).iconTheme.color,
+                        size: 18.0,
                       ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
+                      const SizedBox(width: 4.0),
+                      Text(
+                        'Voice Mode',
+                        style: TextStyle(
                           color: widget.isInVoiceMode
                               ? Colors.greenAccent
-                              : Theme.of(context).iconTheme.color!.withAlpha(100),
+                              : Theme.of(context).iconTheme.color,
                         ),
-                        borderRadius: BorderRadius.circular(100.0),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            widget.isInVoiceMode ? Icons.mic : Icons.mic_off,
-                            color: widget.isInVoiceMode
-                                ? Colors.greenAccent
-                                : Theme.of(context).iconTheme.color,
-                            size: 18.0,
-                          ),
-                          const SizedBox(width: 4.0),
-                          Text(
-                            'Voice Mode',
-                            style: TextStyle(
-                              color: widget.isInVoiceMode
-                                  ? Colors.greenAccent
-                                  : Theme.of(context).iconTheme.color,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-              // Send and Mic Button
+              const SizedBox(width: 20.0),
               widget.isInVoiceMode
                   ? IconButton(
                 onPressed: () {

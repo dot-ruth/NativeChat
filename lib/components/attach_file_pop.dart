@@ -10,12 +10,12 @@ class AttachFilePopup extends StatelessWidget {
   final VoidCallback onPickCamera;
 
   const AttachFilePopup({
-    Key? key,
+    super.key,
     required this.onPickFile,
     required this.onPickImage,
     required this.onPickAudio,
     required this.onPickCamera,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +32,16 @@ class AttachFilePopup extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.attach_file, color: Colors.white60, size: 20.0),
+          children:  [
+            Icon(Icons.attach_file,
+                color: Theme.of(context).iconTheme.color,
+                size: 20.0,
+            ),
             SizedBox(width: 6.0),
             Text(
               'Attach File',
-              style: TextStyle(color: Colors.white60),
+              style: TextStyle(color: Theme.of(context).iconTheme.color
+              ),
             ),
           ],
         ),

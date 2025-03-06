@@ -643,9 +643,9 @@ String? attachedFileName;
                       isOneSidedChatMode: isOneSidedChatMode,
                     )
                   : ConversationFeed(
+            isOneSidedChatMode: isOneSidedChatMode,
                       scrollController: scrollController,
                       chatHistory: chatHistory,
-                      isOneSidedChatMode: isOneSidedChatMode,
                     ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
