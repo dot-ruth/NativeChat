@@ -19,6 +19,8 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../components/attachment_picker.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 
@@ -43,92 +45,10 @@ class _HomepageState extends State<Homepage> {
       _showingAttachmentOptions = !_showingAttachmentOptions;
     });
   }
-  Future<void> _pickAudioFile() async {
-    setState(() {
-      _loading = true;
-    });
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['mp3', 'm4a'],
-        withData: true,
-      );
-      if (result == null || result.files.isEmpty) {
-        setState(() {
-          _loading = false;
-        });
-        return;
-      }
-      final file = result.files.first;
-      attachedFileBytes = file.bytes;
-      // Set MIME type based on extension.
-      if (file.extension?.toLowerCase() == 'mp3') {
-        attachedMime = 'audio/mpeg';
-      } else if (file.extension?.toLowerCase() == 'm4a') {
-        attachedMime = 'audio/m4a';
-      } else {
-        attachedMime = 'application/octet-stream';
-      }
-      setState(() {
-        chatHistory.add({
-          "from": "user",
-          "content": "",
-          "file": {
-            "name": file.name,
-            "bytes": file.bytes,
-            "mime": attachedMime,
-            "isAudio": true,
-          },
-        });
-        _loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
+
 // Updated chatWithAI method to check for attached image data.
 // If present, compose a multi-part message using both prompt and image.
-  void chatWithAI() async {
-    if (userMessageController.text.trim().isNotEmpty) {
-      var userInput = userMessageController.text.trim();
-      userMessageController.clear();
-      addUserInputToChatHistory(userInput);
-      setSystemMessage('getting response...');
 
-      final chat = model.startChat(history: []);
-      Content content;
-
-      if (attachedFileBytes != null && attachedMime != null) {
-        content = Content.multi([
-          TextPart(userInput),
-          DataPart(attachedMime!, attachedFileBytes!),
-        ]);
-        attachedFileBytes = null;
-        attachedMime = null;
-      } else {
-        content = Content.text('$userInput CONTEXT: $chatHistory');
-      }
-
-      try {
-        final response = await chat.sendMessage(content);
-        if (response.functionCalls.isNotEmpty) {
-          await functionCallHandler(userInput, response.functionCalls);
-        } else {
-          if (response.text.toString().trim() != 'null') {
-            gotResponseFromAI(response.text);
-            animateChatHistoryToBottom();
-          }
-        }
-      } catch (e) {
-        setSystemMessage(e, isError: true);
-        if (isInVoiceMode) {
-          speak(e.toString());
-        }
-      }
-    }
-  }
 
   void addUserInputToChatHistory(userInput) {
     setState(() {
@@ -376,6 +296,7 @@ class _HomepageState extends State<Homepage> {
     final imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
     return imageExtensions.contains(extension.toLowerCase());
   }
+// dart
   Future<void> _pickFile() async {
     setState(() {
       _loading = true;
@@ -392,22 +313,11 @@ class _HomepageState extends State<Homepage> {
       }
       final file = result.files.first;
       setState(() {
-        chatHistory.add({
-          "from": "user",
-          "content": "",
-          "file": {
-            "name": file.name,
-            "bytes": file.bytes,
-            "mime": _determineMimeType(file.extension),
-            "isImage": _isImageFile(file.extension),
-          }
-        });
-        _loading = false;
-
-        attachedImageBytes = file.bytes;
+        // Only update attachment state, do not add to chatHistory
+        attachedFileBytes = file.bytes;
         attachedMime = _determineMimeType(file.extension);
+        _loading = false;
       });
-
     } catch (e) {
       setState(() {
         _loading = false;
@@ -430,15 +340,47 @@ class _HomepageState extends State<Homepage> {
         });
         return;
       }
-      attachedImageBytes = result.files.first.bytes;
-      attachedMime = _determineMimeType(result.files.first.extension);
-
       setState(() {
-        chatHistory.add({
-          "from": "user",
-          "content": "",
-          "image": attachedImageBytes,
+        // Only update attachment state, do not add to chatHistory
+        attachedImageBytes = result.files.first.bytes;
+        attachedMime = _determineMimeType(result.files.first.extension);
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+// dart
+  Future<void> _pickAudioFile() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['mp3', 'm4a'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) {
+        setState(() {
+          _loading = false;
         });
+        return;
+      }
+      final file = result.files.first;
+      attachedFileBytes = file.bytes;
+      // Set MIME type based on extension.
+      if (file.extension?.toLowerCase() == 'mp3') {
+        attachedMime = 'audio/mpeg';
+      } else if (file.extension?.toLowerCase() == 'm4a') {
+        attachedMime = 'audio/m4a';
+      } else {
+        attachedMime = 'application/octet-stream';
+      }
+      setState(() {
+        // Do not add to chatHistory immediately.
         _loading = false;
       });
     } catch (e) {
@@ -452,33 +394,96 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       _loading = true;
     });
-
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: ImageSource.camera);
-
       if (image == null) {
         setState(() {
           _loading = false;
         });
         return;
       }
-
       attachedImageBytes = await image.readAsBytes();
       attachedMime = _determineMimeType(image.path.split('.').last);
-
       setState(() {
-        chatHistory.add({
-          "from": "user",
-          "content": "",
-          "image": attachedImageBytes,
-        });
+        // Do not add to chatHistory immediately.
         _loading = false;
       });
     } catch (e) {
       setState(() {
         _loading = false;
       });
+    }
+  }
+// dart
+  void chatWithAI() async {
+    final userInput = userMessageController.text.trim();
+    if (userInput.isEmpty && attachedFileBytes == null && attachedImageBytes == null) {
+      // No input to process.
+      return;
+    }
+
+    // Clear the text field before processing.
+    userMessageController.clear();
+    final Map<String, dynamic> message = {
+      "from": "user",
+      "content": userInput,
+    };
+
+    Content content;
+    // Check if an attachment exists.
+    if ((attachedFileBytes != null || attachedImageBytes != null) && attachedMime != null) {
+      Uint8List attachmentData = attachedFileBytes ?? attachedImageBytes!;
+      // Create a multi-part message.
+      content = Content.multi([
+        TextPart(userInput),
+        DataPart(attachedMime!, attachmentData),
+      ]);
+
+      // Update message with attachment preview.
+      if (attachedImageBytes != null && attachedMime!.startsWith('image/')) {
+        message["image"] = attachedImageBytes;
+      } else {
+        message["file"] = {
+          "name": "File",
+          "bytes": attachmentData,
+          "mime": attachedMime,
+          "isAudio": attachedMime!.startsWith('audio/'),
+        };
+      }
+    } else {
+      // For text-only input, send just the text.
+      content = Content.text(userInput);
+    }
+
+    // Add user message to chat history.
+    setState(() {
+      chatHistory.add(message);
+    });
+
+    // Clear any pending attachment state.
+    removeAttachment();
+    final List<Content> chatHistoryContent = chatHistory
+        .map<Content>((msg) => Content.text(msg['content'] as String))
+        .toList();
+    try {
+      setSystemMessage("getting response...");
+
+      final chat = model.startChat(history: chatHistoryContent);
+      final response = await chat.sendMessage(content);
+      if (response.functionCalls.isNotEmpty) {
+        await functionCallHandler(userInput, response.functionCalls);
+      } else {
+        if (response.text.toString().trim() != "null") {
+          gotResponseFromAI(response.text);
+          animateChatHistoryToBottom();
+        }
+      }
+    } catch (e) {
+      setSystemMessage(e, isError: true);
+      if (isInVoiceMode) {
+        speak(e.toString());
+      }
     }
   }
 
@@ -532,11 +537,10 @@ class _HomepageState extends State<Homepage> {
       ),
     );
   }
-  // Dart
-// In your _HomepageState class
+// dart
   void removeAttachment() {
     setState(() {
-      // Remove pending attachment from chatHistory if it exists as the last message
+      // Remove pending attachment from chatHistory if it exists as the last message.
       if (chatHistory.isNotEmpty) {
         final lastMessage = chatHistory.last;
         if (lastMessage['from'] == "user" &&
@@ -547,12 +551,17 @@ class _HomepageState extends State<Homepage> {
       }
       // Clear attachment state
       attachedImageBytes = null;
+      attachedFileBytes = null;  // Clear file bytes as well
       attachedMime = null;
     });
   }
 
+// dart
   Widget _buildAttachmentPreview() {
-    if (attachedFileBytes == null) return const SizedBox.shrink();
+    // Check for file or image bytes
+    final Uint8List? previewBytes = attachedFileBytes ?? attachedImageBytes;
+    if (previewBytes == null) return const SizedBox.shrink();
+
     final bool isImage = attachedMime != null && attachedMime!.startsWith('image/');
     final bool isAudio = attachedMime != null && attachedMime!.startsWith('audio/');
     return Container(
@@ -584,7 +593,7 @@ class _HomepageState extends State<Homepage> {
                 ? ClipRRect(
               borderRadius: BorderRadius.circular(12.0),
               child: Image.memory(
-                attachedFileBytes!,
+                previewBytes,
                 height: 100,
                 fit: BoxFit.fitHeight,
               ),
@@ -655,44 +664,7 @@ class _HomepageState extends State<Homepage> {
       ),
     );
   }
-  Widget _buildAnimatedIconButton(IconData icon, VoidCallback onPressed) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 200),
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.grey[900],
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: IconButton(
-              constraints: const BoxConstraints(),
-              padding: EdgeInsets.zero,
-              icon: Icon(icon, size: 24),
-              color: Theme.of(context).colorScheme.onSecondary,
-              onPressed: () {
-                setState(() {
-                  _showingAttachmentOptions = false;
-                });
-                onPressed();
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
+
   void initializations() async {
     // Clear Chat
     chatHistory = [];
@@ -777,33 +749,32 @@ class _HomepageState extends State<Homepage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (_showingAttachmentOptions)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  margin: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    spacing: 10,
-                    children: [
-                      _buildAnimatedIconButton(
-                        Icons.file_present_rounded,
-                        _pickFile,
-                      ),
-                      _buildAnimatedIconButton(
-                        Icons.image_rounded,
-                        _pickImageFromGallery,
-                      ),
-                      _buildAnimatedIconButton(
-                        Icons.camera_alt_rounded,
-                        _captureImageFromCamera,
-                      ),
-                      _buildAnimatedIconButton(
-                        Icons.mic,
-                        _pickAudioFile,
-                      ),
-                    ],
-                  ),
+              // In your _HomepageState class build method
+                AttachmentPicker(
+                  onPickFile: () {
+                    _pickFile();
+                    setState(() {
+                      _showingAttachmentOptions = false;
+                    });
+                  },
+                  onPickImage: () {
+                    _pickImageFromGallery();
+                    setState(() {
+                      _showingAttachmentOptions = false;
+                    });
+                  },
+                  onPickAudio: () {
+                    _pickAudioFile();
+                    setState(() {
+                      _showingAttachmentOptions = false;
+                    });
+                  },
+                  onPickCamera: () {
+                    _captureImageFromCamera();
+                    setState(() {
+                      _showingAttachmentOptions = false;
+                    });
+                  },
                 ),
               _buildAttachmentPreview(),
               isAddingAPIKey == true
