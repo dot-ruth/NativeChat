@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
 import "package:gpt_markdown/gpt_markdown.dart";
-import "package:nativechat/components/circle_dot.dart";
-import "package:nativechat/components/codeblock.dart";
-import "package:nativechat/components/dashed_border_exracted.dart";
+import "package:nativechat/components/chat_feed/circle_dot.dart";
+import "package:nativechat/components/chat_feed/codeblock.dart";
+import "package:nativechat/components/chat_feed/dashed_border_exracted.dart";
 import "package:theme_provider/theme_provider.dart";
 
 class AIResponse extends StatefulWidget {

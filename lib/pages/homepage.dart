@@ -7,10 +7,10 @@ import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:hive/hive.dart';
 import 'package:nativechat/components/apikey_input.dart';
-import 'package:nativechat/components/attachment_preview.dart';
-import 'package:nativechat/components/conversation_feed.dart';
+import 'package:nativechat/components/attachment_preview/attachment_preview.dart';
+import 'package:nativechat/components/chat_feed/conversation_feed.dart';
 import 'package:nativechat/components/home_appbar.dart';
-import 'package:nativechat/components/input_box.dart';
+import 'package:nativechat/components/input_box/input_box.dart';
 import 'package:nativechat/components/prompt_suggestions.dart';
 import 'package:nativechat/components/remarks.dart';
 import 'package:nativechat/constants/constants.dart';
@@ -20,7 +20,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../components/attach_file_pop.dart';
+import '../components/attach_file_popup_menu/attach_file_popup_menu.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -42,7 +42,7 @@ class _HomepageState extends State<Homepage> {
   Uint8List? attachedImageBytes;
   Uint8List? attachedFileBytes;
   String? attachedMime;
-String? attachedFileName;
+  String? attachedFileName;
   void addUserInputToChatHistory(userInput) {
     setState(() {
       chatHistory.add({
@@ -284,7 +284,8 @@ String? attachedFileName;
     // Model Initialization
     modelInitialization();
   }
-  bool _isImageFile(String? extension) {
+
+  bool isImageFile(String? extension) {
     if (extension == null) return false;
     final imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
     return imageExtensions.contains(extension.toLowerCase());
@@ -306,10 +307,10 @@ String? attachedFileName;
       }
       final file = result.files.first;
       attachedFileName = file.name;
-      // Use _isImageFile to confirm if the file is an image.
+      // Use isImageFile to confirm if the file is an image.
       setState(() {
         attachedFileBytes = file.bytes;
-        attachedMime =  _determineMimeType(file.extension) ;
+        attachedMime = _determineMimeType(file.extension);
         _loading = false;
       });
     } catch (e) {
@@ -346,6 +347,7 @@ String? attachedFileName;
       });
     }
   }
+
 // dart
   Future<void> _pickAudioFile() async {
     setState(() {
@@ -411,10 +413,11 @@ String? attachedFileName;
     }
   }
 
-
   void chatWithAI() async {
     final userInput = userMessageController.text.trim();
-    if (userInput.isEmpty && attachedFileBytes == null && attachedImageBytes == null) {
+    if (userInput.isEmpty &&
+        attachedFileBytes == null &&
+        attachedImageBytes == null) {
       // No input to process.
       return;
     }
@@ -427,7 +430,8 @@ String? attachedFileName;
 
     Content content;
     // Check if an attachment exists.
-    if ((attachedFileBytes != null || attachedImageBytes != null) && attachedMime != null) {
+    if ((attachedFileBytes != null || attachedImageBytes != null) &&
+        attachedMime != null) {
       Uint8List attachmentData = attachedFileBytes ?? attachedImageBytes!;
 
       // Create a multi-part message.
@@ -521,6 +525,7 @@ String? attachedFileName;
         return 'application/octet-stream';
     }
   }
+
   void modelInitialization() {
     // Model
     model = GenerativeModel(
@@ -547,6 +552,7 @@ String? attachedFileName;
       ),
     );
   }
+
 // dart
   void removeAttachment() {
     setState(() {
@@ -554,18 +560,18 @@ String? attachedFileName;
       if (chatHistory.isNotEmpty) {
         final lastMessage = chatHistory.last;
         if (lastMessage['from'] == "user" &&
-            (lastMessage.containsKey('file') || lastMessage.containsKey('image')) &&
+            (lastMessage.containsKey('file') ||
+                lastMessage.containsKey('image')) &&
             (lastMessage['content'] as String).isEmpty) {
           chatHistory.removeLast();
         }
       }
       // Clear attachment state
       attachedImageBytes = null;
-      attachedFileBytes = null;  // Clear file bytes as well
+      attachedFileBytes = null; // Clear file bytes as well
       attachedMime = null;
     });
   }
-
 
   void initializations() async {
     // Clear Chat
@@ -643,76 +649,82 @@ String? attachedFileName;
                       isOneSidedChatMode: isOneSidedChatMode,
                     )
                   : ConversationFeed(
-            isOneSidedChatMode: isOneSidedChatMode,
+                      isOneSidedChatMode: isOneSidedChatMode,
                       scrollController: scrollController,
                       chatHistory: chatHistory,
                     ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (_showingAttachmentOptions)
-              // In your _HomepageState class build method
-                AttachFilePopup(
-                  onPickFile: () {
-                    _pickFile();
-                    setState(() {
-                      _showingAttachmentOptions = false;
-                    });
-                  },
-                  onPickImage: () {
-                    _pickImageFromGallery();
-                    setState(() {
-                      _showingAttachmentOptions = false;
-                    });
-                  },
-                  onPickAudio: () {
-                    _pickAudioFile();
-                    setState(() {
-                      _showingAttachmentOptions = false;
-                    });
-                  },
-                  onPickCamera: () {
-                    _captureImageFromCamera();
-                    setState(() {
-                      _showingAttachmentOptions = false;
-                    });
-                  },
-                ),
-              AttachmentPreview(
+          Container(
+            color: Colors.transparent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_showingAttachmentOptions)
+                  AttachFilePopupMenu(
+                    onPickFile: () {
+                      _pickFile();
+                      setState(() {
+                        _showingAttachmentOptions = false;
+                      });
+                    },
+                    onPickImage: () {
+                      _pickImageFromGallery();
+                      setState(() {
+                        _showingAttachmentOptions = false;
+                      });
+                    },
+                    onPickAudio: () {
+                      _pickAudioFile();
+                      setState(() {
+                        _showingAttachmentOptions = false;
+                      });
+                    },
+                    onPickCamera: () {
+                      _captureImageFromCamera();
+                      setState(() {
+                        _showingAttachmentOptions = false;
+                      });
+                    },
+                  ),
+
+                // Attachment Preview
+                AttachmentPreview(
                   attachedFileBytes: attachedFileBytes,
                   attachedImageBytes: attachedImageBytes,
                   attachedMime: attachedMime,
                   attachedFileName: attachedFileName,
-                  removeAttachment: removeAttachment),
-              isAddingAPIKey == true
-                  ? APIKeyInput(
-                getSettings: getSettings,
-              )
-                  : InputBox(
-                chatWithAI: chatWithAI,
-                onPickFile: () {
-                  _pickFile();
-                },
-                onPickImage: () {
-                  _pickImageFromGallery();
-                },
-                onPickAudio: () {
-                  _pickAudioFile();
-                },
-                onPickCamera: () {
-                  _captureImageFromCamera();
-                },
+                  removeAttachment: removeAttachment,
+                ),
 
-                summarizeText: summarizeText,
-                isSummarizeInContext: isSummarizeInContext,
-                userMessageController: userMessageController,
-                startListening: startListening,
-                stopListening: stopListening,
-                speechToText: speechToText,
-                toggleVoiceMode: toggleVoiceMode,
-                isInVoiceMode: isInVoiceMode,
-              ),
-            ],
+                // Main Input Box
+                isAddingAPIKey == true
+                    ? APIKeyInput(
+                        getSettings: getSettings,
+                      )
+                    : InputBox(
+                        chatWithAI: chatWithAI,
+                        onPickFile: () {
+                          _pickFile();
+                        },
+                        onPickImage: () {
+                          _pickImageFromGallery();
+                        },
+                        onPickAudio: () {
+                          _pickAudioFile();
+                        },
+                        onPickCamera: () {
+                          _captureImageFromCamera();
+                        },
+                        summarizeText: summarizeText,
+                        isSummarizeInContext: isSummarizeInContext,
+                        userMessageController: userMessageController,
+                        startListening: startListening,
+                        stopListening: stopListening,
+                        speechToText: speechToText,
+                        toggleVoiceMode: toggleVoiceMode,
+                        isInVoiceMode: isInVoiceMode,
+                      ),
+              ],
+            ),
           ),
         ],
       ),

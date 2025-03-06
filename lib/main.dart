@@ -37,24 +37,6 @@ class _MyAppState extends State<MyApp> {
     //   overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
     // );
 
-    // return MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   initialRoute: "/",
-    //   routes: {"/": (context) => const Homepage()},
-    //   theme: ThemeData(
-    //     scaffoldBackgroundColor: darkGreyColor,
-    //     appBarTheme: AppBarTheme(
-    //       backgroundColor: darkGreyColor,
-    //       iconTheme: IconThemeData(
-    //         color: Colors.grey[800],
-    //       ),
-    //     ),
-    //     iconTheme: IconThemeData(
-    //       color: Colors.grey[500]!,
-    //     ),
-    //   ),
-    // );
-
     return ThemeProvider(
       saveThemesOnChange: true,
       defaultThemeId: "dark_theme",

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nativechat/components/circle_dot.dart';
+import 'package:nativechat/components/chat_feed/circle_dot.dart';
 import 'package:nativechat/constants/constants.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -26,7 +26,7 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
   void initState() {
     super.initState();
     promptSuggestions.shuffle();
-    randomPromptSuggestions = promptSuggestions.sublist(0, 10).cast<String>();
+    randomPromptSuggestions = promptSuggestions.sublist(0, 8).cast<String>();
     // Sort by character lenght
     randomPromptSuggestions.sort((a, b) => a.length.compareTo(b.length));
   }

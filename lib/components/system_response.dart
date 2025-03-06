@@ -1,6 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:nativechat/components/dashed_border_exracted.dart';
+import 'package:nativechat/components/chat_feed/dashed_border_exracted.dart';
 
 class SystemResponse extends StatefulWidget {
   const SystemResponse({
