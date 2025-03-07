@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:theme_provider/theme_provider.dart';
@@ -8,11 +9,13 @@ class AttachedFileContainer extends StatefulWidget {
     required this.fileName,
     required this.isUser,
     required this.isOneSidedChatMode,
+    this.isAudio = false,
   });
 
   final String fileName;
   final bool isUser;
   final bool isOneSidedChatMode;
+  final bool isAudio;
 
   @override
   State<AttachedFileContainer> createState() => _AttachedFileContainerState();
@@ -24,6 +27,11 @@ class _AttachedFileContainerState extends State<AttachedFileContainer> {
     var color = ThemeProvider.themeOf(context).id == "light_theme"
         ? Colors.black
         : Colors.white;
+
+    // Choose the leading icon based on isAudio flag.
+    final icon = widget.isAudio
+        ? Icons.multitrack_audio_outlined
+        : Ionicons.folder_open_outline;
 
     return Container(
       alignment: Alignment.centerRight,
@@ -54,23 +62,20 @@ class _AttachedFileContainerState extends State<AttachedFileContainer> {
         borderRadius: BorderRadius.circular(100.0),
       ),
       child: Row(
-        spacing: 6.0,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Icon(
-            Ionicons.folder_open_outline,
-            // Ionicons.document_text_outline,
+            icon,
             color: color,
             size: 18.0,
           ),
+          const SizedBox(width: 6.0),
           Expanded(
             child: Text(
               widget.fileName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: color,
-              ),
+              style: TextStyle(color: color),
             ),
           ),
         ],

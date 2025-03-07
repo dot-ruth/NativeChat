@@ -77,6 +77,7 @@ class _ConversationFeedState extends State<ConversationFeed> {
                     : CrossAxisAlignment.end,
                 children: [
                   AttachedFileContainer(
+                    isAudio: fileData['isAudio'],
                     fileName: fileName,
                     isUser: isUser,
                     isOneSidedChatMode: widget.isOneSidedChatMode,
