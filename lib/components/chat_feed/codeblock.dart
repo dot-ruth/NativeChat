@@ -35,20 +35,24 @@ class _CodeblockState extends State<Codeblock> {
   var _collapse = false;
   int _currentThemeIndex = 0;
 
-  // List of available syntax highlighting themes.
-  final List<Map<String, dynamic>> _highlighterThemes = [
+  // List of themes for light mode.
+  final List<Map<String, dynamic>> _lightThemes = [
     {'name': 'vs2015', 'theme': vs2015Theme},
+    {'name': 'atomOneLight', 'theme': atomOneLightTheme},
+    {'name': 'github', 'theme': githubTheme},
+    {'name': 'googlecode', 'theme': googlecodeTheme},
+    {'name': 'solarizedLight', 'theme': solarizedLightTheme},
+  ];
+
+  // List of themes for dark mode.
+  final List<Map<String, dynamic>> _darkThemes = [
     {'name': 'monokaiSublime', 'theme': monokaiSublimeTheme},
     {'name': 'atomOneDark', 'theme': atomOneDarkTheme},
-    {'name': 'github', 'theme': githubTheme},
     {'name': 'dracula', 'theme': draculaTheme},
     {'name': 'a11yDark', 'theme': a11yDarkTheme},
-    {'name': 'atomOneLight', 'theme': atomOneLightTheme},
-    {'name': 'googlecode', 'theme': googlecodeTheme},
     {'name': 'hybrid', 'theme': hybridTheme},
     {'name': 'idea', 'theme': ideaTheme},
     {'name': 'solarizedDark', 'theme': solarizedDarkTheme},
-    {'name': 'solarizedLight', 'theme': solarizedLightTheme},
     {'name': 'tomorrow', 'theme': tomorrowTheme},
     {'name': 'vs', 'theme': vsTheme},
     {'name': 'monokai', 'theme': monokaiTheme},
@@ -66,30 +70,32 @@ class _CodeblockState extends State<Codeblock> {
   }
 
   void changeTheme() {
+    // Determine the active theme list based on the current theme.
+    final bool isLight = ThemeProvider.themeOf(context).id == "light_theme";
+    final activeThemes = isLight ? _lightThemes : _darkThemes;
     setState(() {
-      _currentThemeIndex =
-          (_currentThemeIndex + 1) % _highlighterThemes.length;
+      _currentThemeIndex = (_currentThemeIndex + 1) % activeThemes.length;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isLight = ThemeProvider.themeOf(context).id == "light_theme";
+    // Choose the active theme list based on the current theme.
+    final activeThemes = isLight ? _lightThemes : _darkThemes;
+
     return Material(
-      color: ThemeProvider.themeOf(context).id == "light_theme"
-          ? const Color(0xfff2f2f2)
-          : const Color(0xff121212),
+      color: isLight ? const Color(0xfff2f2f2) : const Color(0xff121212),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-
+          // Top Row with Name, Theme, Copy and Collapse Buttons
           Container(
             decoration: BoxDecoration(
-              color: ThemeProvider.themeOf(context).id == "light_theme"
-                  ? Colors.grey[300]
-                  : const Color(0xff151515),
+              color: isLight ? Colors.grey[300] : const Color(0xff151515),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(10.0),
                 topRight: Radius.circular(10.0),
@@ -106,21 +112,16 @@ class _CodeblockState extends State<Codeblock> {
                 Text(
                   widget.name,
                   style: TextStyle(
-                    color: ThemeProvider.themeOf(context).id == "light_theme"
-                        ? Colors.black
-                        : Colors.grey[700],
+                    color: isLight ? Colors.black : Colors.grey[700],
                   ),
                 ),
                 const Spacer(),
-
                 GestureDetector(
                   onTap: changeTheme,
                   child: Icon(
                     Ionicons.color_palette,
                     size: 18,
-                    color: ThemeProvider.themeOf(context).id == "light_theme"
-                        ? Colors.grey[700]
-                        : Colors.grey[500],
+                    color: isLight ? Colors.grey[700] : Colors.grey[500],
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -130,12 +131,8 @@ class _CodeblockState extends State<Codeblock> {
                     _copied ? Icons.done : Icons.content_paste,
                     size: 15,
                     color: _copied
-                        ? ThemeProvider.themeOf(context).id == "light_theme"
-                        ? Colors.green[600]
-                        : Colors.greenAccent
-                        : ThemeProvider.themeOf(context).id == "light_theme"
-                        ? Colors.grey[700]
-                        : Colors.grey[500],
+                        ? (isLight ? Colors.green[600] : Colors.greenAccent)
+                        : (isLight ? Colors.grey[700] : Colors.grey[500]),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -151,12 +148,8 @@ class _CodeblockState extends State<Codeblock> {
                         : Icons.arrow_upward_outlined,
                     size: 18,
                     color: _collapse
-                        ? ThemeProvider.themeOf(context).id == "light_theme"
-                        ? Colors.green[600]
-                        : Colors.greenAccent
-                        : ThemeProvider.themeOf(context).id == "light_theme"
-                        ? Colors.grey[700]
-                        : Colors.grey[500],
+                        ? (isLight ? Colors.green[600] : Colors.greenAccent)
+                        : (isLight ? Colors.grey[700] : Colors.grey[500]),
                   ),
                 ),
               ],
@@ -166,9 +159,7 @@ class _CodeblockState extends State<Codeblock> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             decoration: BoxDecoration(
-              color: ThemeProvider.themeOf(context).id == "light_theme"
-                  ? const Color(0xfff2f2f2)
-                  : const Color(0xff0e0e0e),
+              color: isLight ? const Color(0xfff2f2f2) : const Color(0xff0e0e0e),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(10.0),
                 bottomRight: Radius.circular(10.0),
@@ -182,7 +173,7 @@ class _CodeblockState extends State<Codeblock> {
                 language: widget.name.isNotEmpty
                     ? widget.name.toLowerCase()
                     : 'plaintext',
-                theme: _highlighterThemes[_currentThemeIndex]['theme'],
+                theme: activeThemes[_currentThemeIndex]['theme'],
                 padding: const EdgeInsets.all(12),
                 textStyle: const TextStyle(
                   fontFamily: 'SourceCodePro',
