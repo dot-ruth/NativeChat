@@ -12,4 +12,10 @@ class Settings extends HiveObject {
 
   @HiveField(2)
   String apikey = "";
+
+  @HiveField(3)
+  int currentLightThemeIndex = 0;
+
+  @HiveField(4)
+  int currentDarkThemeIndex = 0;
 }

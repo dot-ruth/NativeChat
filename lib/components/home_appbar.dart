@@ -44,11 +44,12 @@ class _HomeAppbarState extends State<HomeAppbar> {
             ThemeProvider.controllerOf(context).nextTheme();
           },
           icon: Icon(
-              ThemeProvider.themeOf(context).id == "light_theme"
-                  ? Icons.dark_mode_outlined
-                  : Icons.wb_sunny_outlined,
-              size: 20.0,
-              color: Theme.of(context).iconTheme.color),
+            ThemeProvider.themeOf(context).id == "light_theme"
+                ? Icons.dark_mode_outlined
+                : Icons.wb_sunny_outlined,
+            size: 20.0,
+            color: Theme.of(context).iconTheme.color,
+          ),
         ),
 
         // Change chat layout

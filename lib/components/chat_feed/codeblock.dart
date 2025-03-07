@@ -17,6 +17,7 @@ import 'package:flutter_highlight/themes/vs.dart';
 import 'package:flutter_highlight/themes/vs2015.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
+import 'package:hive/hive.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -33,29 +34,34 @@ class Codeblock extends StatefulWidget {
 class _CodeblockState extends State<Codeblock> {
   var _copied = false;
   var _collapse = false;
-  int _currentThemeIndex = 0;
+  int currentLightThemeIndex = 0;
+  int currentDarkThemeIndex = 0;
 
   // List of themes for light mode.
   final List<Map<String, dynamic>> _lightThemes = [
-    {'name': 'vs2015', 'theme': vs2015Theme},
     {'name': 'atomOneLight', 'theme': atomOneLightTheme},
     {'name': 'github', 'theme': githubTheme},
     {'name': 'googlecode', 'theme': googlecodeTheme},
     {'name': 'solarizedLight', 'theme': solarizedLightTheme},
+    {'name': 'atomOneLight', 'theme': atomOneLightTheme},
+    {'name': 'github', 'theme': githubTheme},
+    {'name': 'googlecode', 'theme': googlecodeTheme},
+    {'name': 'solarizedLight', 'theme': solarizedLightTheme},
+    {'name': 'tomorrow', 'theme': tomorrowTheme},
+    {'name': 'vs', 'theme': vsTheme},
+    {'name': 'idea', 'theme': ideaTheme},
   ];
 
   // List of themes for dark mode.
   final List<Map<String, dynamic>> _darkThemes = [
+    {'name': 'monokai', 'theme': monokaiTheme},
     {'name': 'monokaiSublime', 'theme': monokaiSublimeTheme},
     {'name': 'atomOneDark', 'theme': atomOneDarkTheme},
     {'name': 'dracula', 'theme': draculaTheme},
     {'name': 'a11yDark', 'theme': a11yDarkTheme},
     {'name': 'hybrid', 'theme': hybridTheme},
-    {'name': 'idea', 'theme': ideaTheme},
     {'name': 'solarizedDark', 'theme': solarizedDarkTheme},
-    {'name': 'tomorrow', 'theme': tomorrowTheme},
-    {'name': 'vs', 'theme': vsTheme},
-    {'name': 'monokai', 'theme': monokaiTheme},
+    {'name': 'vs2015', 'theme': vs2015Theme},
   ];
 
   void copyToClipboard() async {
@@ -69,20 +75,53 @@ class _CodeblockState extends State<Codeblock> {
     });
   }
 
+  // dynamic activeThemes;
   void changeTheme() {
     // Determine the active theme list based on the current theme.
-    final bool isLight = ThemeProvider.themeOf(context).id == "light_theme";
-    final activeThemes = isLight ? _lightThemes : _darkThemes;
-    setState(() {
-      _currentThemeIndex = (_currentThemeIndex + 1) % activeThemes.length;
-    });
+    final bool isLight =
+        ThemeProvider.themeOf(context).id == "light_theme" ? true : false;
+    if (isLight == true) {
+      currentLightThemeIndex += 1;
+      if (currentLightThemeIndex >= _lightThemes.length) {
+        currentLightThemeIndex = 0;
+      }
+      setState(() {});
+    } else {
+      currentDarkThemeIndex += 1;
+      if (currentDarkThemeIndex >= _darkThemes.length) {
+        currentDarkThemeIndex = 0;
+      }
+      setState(() {});
+    }
+    saveCurrentThemeIndex();
+  }
+
+  void getSavedThemeIndex() async {
+    Box settingBox = await Hive.openBox("settings");
+    currentLightThemeIndex =
+        await settingBox.get("currentLightThemeIndex") ?? 0;
+    currentDarkThemeIndex = await settingBox.get("currentDarkThemeIndex") ?? 0;
+    setState(() {});
+    Hive.close();
+  }
+
+  void saveCurrentThemeIndex() async {
+    Box settingBox = await Hive.openBox("settings");
+    await settingBox.put("currentLightThemeIndex", currentLightThemeIndex);
+    await settingBox.put("currentDarkThemeIndex", currentDarkThemeIndex);
+    Hive.close();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSavedThemeIndex();
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isLight = ThemeProvider.themeOf(context).id == "light_theme";
-    // Choose the active theme list based on the current theme.
-    final activeThemes = isLight ? _lightThemes : _darkThemes;
+    bool isLight = ThemeProvider.themeOf(context).id == "light_theme";
 
     return Material(
       color: isLight ? const Color(0xfff2f2f2) : const Color(0xff121212),
@@ -117,11 +156,14 @@ class _CodeblockState extends State<Codeblock> {
                 ),
                 const Spacer(),
                 GestureDetector(
-                  onTap: changeTheme,
-                  child: Icon(
-                    Ionicons.color_palette,
-                    size: 18,
-                    color: isLight ? Colors.grey[700] : Colors.grey[500],
+                  onTap: () => {changeTheme()},
+                  child: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: Icon(
+                      Ionicons.color_palette_outline,
+                      size: 18,
+                      color: isLight ? Colors.grey[700] : Colors.grey[500],
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -155,11 +197,15 @@ class _CodeblockState extends State<Codeblock> {
               ],
             ),
           ),
+
           // Code with Syntax Highlighting
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            width: double.infinity,
+            clipBehavior: Clip.hardEdge,
+            constraints: BoxConstraints(
+              maxHeight: _collapse ? 150.0 : double.infinity,
+            ),
             decoration: BoxDecoration(
-              color: isLight ? const Color(0xfff2f2f2) : const Color(0xff0e0e0e),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(10.0),
                 bottomRight: Radius.circular(10.0),
@@ -167,21 +213,46 @@ class _CodeblockState extends State<Codeblock> {
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.all(10),
               child: HighlightView(
                 widget.code,
                 language: widget.name.isNotEmpty
                     ? widget.name.toLowerCase()
                     : 'plaintext',
-                theme: activeThemes[_currentThemeIndex]['theme'],
-                padding: const EdgeInsets.all(12),
-                textStyle: const TextStyle(
+                theme: isLight == true
+                    ? _lightThemes[currentLightThemeIndex]['theme']
+                    : _darkThemes[currentDarkThemeIndex]['theme'],
+                padding: const EdgeInsets.all(12.0),
+                textStyle: TextStyle(
                   fontFamily: 'SourceCodePro',
                   fontSize: 14.0,
                 ),
               ),
             ),
           ),
+
+          // Current Theme Name
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 1.0,
+            ),
+            child: Row(
+              spacing: 4.0,
+              children: [
+                Icon(
+                  Ionicons.color_palette_outline,
+                  size: 14,
+                  color: isLight ? Colors.grey[700] : Colors.grey[500],
+                ),
+                Text(
+                  isLight == true
+                      ? _lightThemes[currentLightThemeIndex]['name']
+                      : _darkThemes[currentDarkThemeIndex]['name'],
+                  style: TextStyle(color: Theme.of(context).iconTheme.color),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
