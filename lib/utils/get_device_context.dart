@@ -14,6 +14,8 @@ import 'package:flutter/services.dart';
 var callsLimit = 100;
 var smsLimit = 100;
 Future<String> getDeviceNetworkInfo() async {
+  await Permission.location.request();
+  await Permission.nearbyWifiDevices.request();
   final info = NetworkInfo();
 
   // Initialize network detail variables.
