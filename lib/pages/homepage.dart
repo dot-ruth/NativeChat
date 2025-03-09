@@ -85,7 +85,13 @@ class _HomepageState extends State<Homepage> {
           setSystemMessage('getting device time...');
           final deviceTime = await getDeviceTime();
           advancedContext += deviceTime;
-        } else if (functionCallName == "getDeviceSpecs") {
+        } else if (functionCallName == "getDeviceNetworkInfo") {
+          setSystemMessage('getting network info...');
+          final networkInfo = await getDeviceNetworkInfo();
+          advancedContext += networkInfo.toString();
+
+        }
+        else if (functionCallName == "getDeviceSpecs") {
           setSystemMessage('getting device specs...');
           final deviceSpecs = await getDeviceSpecs();
           advancedContext += deviceSpecs;

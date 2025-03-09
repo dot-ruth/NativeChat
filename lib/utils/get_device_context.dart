@@ -5,10 +5,93 @@ import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:system_info2/system_info2.dart';
+import 'package:network_info_plus/network_info_plus.dart';
+import 'package:intl/intl.dart';
 
+import 'package:flutter/services.dart';
 // Limits
 var callsLimit = 100;
 var smsLimit = 100;
+Future<String> getDeviceNetworkInfo() async {
+
+
+  final info = NetworkInfo();
+
+  // Initialize network detail variables.
+  String wifiName = 'Unavailable';
+  String wifiBSSID = 'Unavailable';
+  String wifiIP = 'Unavailable';
+  String wifiIPv6 = 'Unavailable';
+  String wifiSubmask = 'Unavailable';
+  String wifiBroadcast = 'Unavailable';
+  String wifiGateway = 'Unavailable';
+
+  try {
+    wifiName = await info.getWifiName() ?? 'Unavailable';
+  } on PlatformException {
+    wifiName = 'Failed to retrieve Wifi Name';
+  }
+  try {
+    wifiBSSID = await info.getWifiBSSID() ?? 'Unavailable';
+  } on PlatformException {
+    wifiBSSID = 'Failed to retrieve Wifi BSSID';
+  }
+  try {
+    wifiIP = await info.getWifiIP() ?? 'Unavailable';
+  } on PlatformException {
+    wifiIP = 'Failed to retrieve Wifi IP';
+  }
+  try {
+    wifiIPv6 = await info.getWifiIPv6() ?? 'Unavailable';
+  } on PlatformException {
+    wifiIPv6 = 'Failed to retrieve Wifi IPv6';
+  }
+  try {
+    wifiSubmask = await info.getWifiSubmask() ?? 'Unavailable';
+  } on PlatformException {
+    wifiSubmask = 'Failed to retrieve Wifi Submask';
+  }
+  try {
+    wifiBroadcast = await info.getWifiBroadcast() ?? 'Unavailable';
+  } on PlatformException {
+    wifiBroadcast = 'Failed to retrieve Wifi Broadcast';
+  }
+  try {
+    wifiGateway = await info.getWifiGatewayIP() ?? 'Unavailable';
+  } on PlatformException {
+    wifiGateway = 'Failed to retrieve Wifi Gateway';
+  }
+
+  // Determine connection state using the WiFi IP.
+  bool isConnected = wifiIP != 'Unavailable' && !wifiIP.startsWith('Failed');
+  String connectionType = isConnected ? 'wifi' : 'none';
+  String networkInterface = isConnected ? 'wlan0' : 'none';
+
+
+  Map<String, String> networkDetails = {
+    'Network Connection Type': connectionType,
+    'Is Connected': isConnected.toString(),
+    'WiFi Name': wifiName,
+    'WiFi BSSID': wifiBSSID,
+    'WiFi IP': wifiIP,
+    'WiFi IPv6': wifiIPv6,
+    'WiFi Submask': wifiSubmask,
+    'WiFi Broadcast': wifiBroadcast,
+    'WiFi Gateway': wifiGateway,
+    'Network Interface': networkInterface,
+  };
+
+  // Build the advancedContext string.
+  String advancedContext = "Here is your device network information:\n"
+    ;
+  for (var entry in networkDetails.entries) {
+    advancedContext += "${entry.key}: ${entry.value}\n";
+  }
+
+
+  return   advancedContext;
+
+}
 
 Future<String> getDeviceApps(installedAppsLength, installedAppsString) async {
   // Get Installed Apps
@@ -18,7 +101,7 @@ Future<String> getDeviceApps(installedAppsLength, installedAppsString) async {
     installedAppsLength = apps.length;
     for (var eachApp in apps) {
       installedAppsString +=
-          'AppName: ${eachApp.name} PackageName:${eachApp.packageName} VersionName: ${eachApp.versionName} VersionCode:${eachApp.versionCode} InstalledTimestamp:${eachApp.installedTimestamp.toString()} \n';
+      'AppName: ${eachApp.name} PackageName:${eachApp.packageName} VersionName: ${eachApp.versionName} VersionCode:${eachApp.versionCode} InstalledTimestamp:${eachApp.installedTimestamp.toString()} \n';
     }
   }
   var advancedContext =
@@ -44,7 +127,7 @@ Future<String> getDeviceSpecs() async {
   final processors = SysInfo.cores;
   for (var processor in processors) {
     coresInfo +=
-        'Architecture: ${processor.architecture} Name: ${processor.name} Socket: ${processor.socket} Vendor: ${processor.vendor}';
+    'Architecture: ${processor.architecture} Name: ${processor.name} Socket: ${processor.socket} Vendor: ${processor.vendor}';
   }
 
   var systemInfo =
@@ -58,23 +141,30 @@ Future<String> getDeviceSpecs() async {
   return advancedContext;
 }
 
+
 Future<String> getCallLogs() async {
-  // Ask Permissions
+  // Request permissions
   await Permission.phone.request();
   await Permission.contacts.request();
 
-  // Get Call Logs
   final callLogs = await CallLog.fetchCallLogs();
-
   var messageString = '';
+  var dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+
   for (var eachCallLog in callLogs) {
+    var name = eachCallLog.name ?? 'Unknown Number';
+    var callType = eachCallLog.callType?.name ?? 'Type unknown';
+    // Convert timestamp into a human readable format
+    var dateTime = DateTime.fromMillisecondsSinceEpoch(eachCallLog.timestamp!);
+    var formattedTime = dateFormat.format(dateTime);
+    var simDisplayName = eachCallLog.simDisplayName ?? 'Unknown SIM';
+    var cachedNumberLabel = eachCallLog.cachedNumberLabel ?? 'Unknown Label';
+    var duration =  eachCallLog.duration ?? 00.00;
     messageString +=
-        'Name: ${eachCallLog.name.toString()} callType: ${eachCallLog.callType?.name} Number: ${eachCallLog.number} cachedNumberLabel:${eachCallLog.cachedNumberLabel.toString()} duration:${eachCallLog.duration} timestamp:${eachCallLog.timestamp.toString()} simDisplayName: ${eachCallLog.simDisplayName} \n';
+    'Name: $name callType: $callType Number: ${eachCallLog.number} cachedNumberLabel: $cachedNumberLabel duration: $duration timestamp: $formattedTime simDisplayName: $simDisplayName \n';
   }
 
-  var advancedContext =
-      'YOUR LAST ${callLogs.length} CALL HISTORY: $messageString';
-
+  var advancedContext = 'YOUR LAST ${callLogs.length} CALL HISTORY: $messageString';
   return advancedContext;
 }
 
@@ -91,7 +181,7 @@ Future<String> getSMS() async {
   var messageString = '';
   for (var eachMessage in allSMS) {
     messageString +=
-        'ID: ${eachMessage.id} From:${eachMessage.sender!} Content:${eachMessage.body!} Date:${eachMessage.date.toString()} isRead: ${eachMessage.isRead} kind(Sent or Recived): ${eachMessage.kind} \n';
+    'ID: ${eachMessage.id} From:${eachMessage.sender!} Content:${eachMessage.body!} Date:${eachMessage.date.toString()} isRead: ${eachMessage.isRead} kind(Sent or Recived): ${eachMessage.kind} \n';
   }
 
   var advancedContext = 'YOUR LAST $smsLimit SMS HISTORY: $messageString';

@@ -4,6 +4,7 @@ final String googleAIStudioURL = "https://aistudio.google.com/app/apikey";
 final String github = "https://github.com/dagmawibabi/NativeChat";
 
 final List promptSuggestions = [
+  "Get my network state and information",
   "Show me 3 beautiful math equations",
   "Show me my device's specs in table form",
   'Tell me my unread text messages?',
@@ -78,6 +79,17 @@ final functionDeclarations = [
     }),
   ),
 
+  //NETWORK STATE
+  FunctionDeclaration(
+      "getDeviceNetworkInfo",
+      "Gets the current network state of the device as a formatted multi-line string.",
+      Schema.object(properties: {
+        "advancedContext": Schema.string(
+            description: "Multi-line string containing network connection type, connectivity status, WiFi details, and network interface."
+        )
+      }
+      )
+  ),
   // SPECS
   FunctionDeclaration(
     "getDeviceSpecs",
