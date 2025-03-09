@@ -81,14 +81,39 @@ final functionDeclarations = [
 
   //NETWORK STATE
   FunctionDeclaration(
-      "getDeviceNetworkInfo",
-      "Gets the current network state of the device as a formatted multi-line string.",
-      Schema.object(properties: {
-        "advancedContext": Schema.string(
-            description: "Multi-line string containing network connection type, connectivity status, WiFi details, and network interface."
-        )
-      }
-      )
+    "getDeviceNetworkInfo",
+    "Retrieves the current network connection details of the device, including connection type, WiFi details, and network interface information.",
+    Schema.object(properties: {
+      'networkDetails': Schema.object(properties: {
+        'Network Connection Type': Schema.string(
+            description:
+                "The type of network connection (e.g., WiFi, Cellular, Ethernet)."),
+        'Is Connected': Schema.boolean(
+            description:
+                "Indicates whether the device is currently connected to a network."),
+        'WiFi Name': Schema.string(
+            description: "The SSID (name) of the connected WiFi network."),
+        'WiFi BSSID': Schema.string(
+            description:
+                "The BSSID (MAC address) of the connected WiFi network."),
+        'WiFi IP': Schema.string(
+            description:
+                "The IPv4 address assigned to the device on the WiFi network."),
+        'WiFi IPv6': Schema.string(
+            description:
+                "The IPv6 address assigned to the device on the WiFi network."),
+        'WiFi Submask': Schema.string(
+            description: "The subnet mask of the connected WiFi network."),
+        'WiFi Broadcast': Schema.string(
+            description:
+                "The broadcast address of the connected WiFi network."),
+        'WiFi Gateway': Schema.string(
+            description:
+                "The gateway (router) address of the connected WiFi network."),
+        'Network Interface': Schema.string(
+            description: "The name of the active network interface."),
+      }),
+    }),
   ),
   // SPECS
   FunctionDeclaration(

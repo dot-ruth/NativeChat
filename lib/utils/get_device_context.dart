@@ -9,12 +9,11 @@ import 'package:network_info_plus/network_info_plus.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/services.dart';
+
 // Limits
 var callsLimit = 100;
 var smsLimit = 100;
 Future<String> getDeviceNetworkInfo() async {
-
-
   final info = NetworkInfo();
 
   // Initialize network detail variables.
@@ -67,7 +66,6 @@ Future<String> getDeviceNetworkInfo() async {
   String connectionType = isConnected ? 'wifi' : 'none';
   String networkInterface = isConnected ? 'wlan0' : 'none';
 
-
   Map<String, String> networkDetails = {
     'Network Connection Type': connectionType,
     'Is Connected': isConnected.toString(),
@@ -82,15 +80,11 @@ Future<String> getDeviceNetworkInfo() async {
   };
 
   // Build the advancedContext string.
-  String advancedContext = "Here is your device network information:\n"
-    ;
+  String advancedContext = "Here is your device network information:\n";
   for (var entry in networkDetails.entries) {
     advancedContext += "${entry.key}: ${entry.value}\n";
   }
-
-
-  return   advancedContext;
-
+  return advancedContext;
 }
 
 Future<String> getDeviceApps(installedAppsLength, installedAppsString) async {
@@ -101,7 +95,7 @@ Future<String> getDeviceApps(installedAppsLength, installedAppsString) async {
     installedAppsLength = apps.length;
     for (var eachApp in apps) {
       installedAppsString +=
-      'AppName: ${eachApp.name} PackageName:${eachApp.packageName} VersionName: ${eachApp.versionName} VersionCode:${eachApp.versionCode} InstalledTimestamp:${eachApp.installedTimestamp.toString()} \n';
+          'AppName: ${eachApp.name} PackageName:${eachApp.packageName} VersionName: ${eachApp.versionName} VersionCode:${eachApp.versionCode} InstalledTimestamp:${eachApp.installedTimestamp.toString()} \n';
     }
   }
   var advancedContext =
@@ -127,7 +121,7 @@ Future<String> getDeviceSpecs() async {
   final processors = SysInfo.cores;
   for (var processor in processors) {
     coresInfo +=
-    'Architecture: ${processor.architecture} Name: ${processor.name} Socket: ${processor.socket} Vendor: ${processor.vendor}';
+        'Architecture: ${processor.architecture} Name: ${processor.name} Socket: ${processor.socket} Vendor: ${processor.vendor}';
   }
 
   var systemInfo =
@@ -140,7 +134,6 @@ Future<String> getDeviceSpecs() async {
 
   return advancedContext;
 }
-
 
 Future<String> getCallLogs() async {
   // Request permissions
@@ -159,12 +152,13 @@ Future<String> getCallLogs() async {
     var formattedTime = dateFormat.format(dateTime);
     var simDisplayName = eachCallLog.simDisplayName ?? 'Unknown SIM';
     var cachedNumberLabel = eachCallLog.cachedNumberLabel ?? 'Unknown Label';
-    var duration =  eachCallLog.duration ?? 00.00;
+    var duration = eachCallLog.duration ?? 00.00;
     messageString +=
-    'Name: $name callType: $callType Number: ${eachCallLog.number} cachedNumberLabel: $cachedNumberLabel duration: $duration timestamp: $formattedTime simDisplayName: $simDisplayName \n';
+        'Name: $name callType: $callType Number: ${eachCallLog.number} cachedNumberLabel: $cachedNumberLabel duration: $duration timestamp: $formattedTime simDisplayName: $simDisplayName \n';
   }
 
-  var advancedContext = 'YOUR LAST ${callLogs.length} CALL HISTORY: $messageString';
+  var advancedContext =
+      'YOUR LAST ${callLogs.length} CALL HISTORY: $messageString';
   return advancedContext;
 }
 
@@ -181,7 +175,7 @@ Future<String> getSMS() async {
   var messageString = '';
   for (var eachMessage in allSMS) {
     messageString +=
-    'ID: ${eachMessage.id} From:${eachMessage.sender!} Content:${eachMessage.body!} Date:${eachMessage.date.toString()} isRead: ${eachMessage.isRead} kind(Sent or Recived): ${eachMessage.kind} \n';
+        'ID: ${eachMessage.id} From:${eachMessage.sender!} Content:${eachMessage.body!} Date:${eachMessage.date.toString()} isRead: ${eachMessage.isRead} kind(Sent or Recived): ${eachMessage.kind} \n';
   }
 
   var advancedContext = 'YOUR LAST $smsLimit SMS HISTORY: $messageString';

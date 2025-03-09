@@ -57,13 +57,13 @@ class _HomepageState extends State<Homepage> {
       speak(content);
     }
     setState(() {
-      if(isNewMessage){
+      if (isNewMessage) {
         chatHistory.add({
-        "from": "ai",
-        "content": content,
+          "from": "ai",
+          "content": content,
         });
-        chatHistory.removeAt(chatHistory.length -2);
-      }else{
+        chatHistory.removeAt(chatHistory.length - 2);
+      } else {
         chatHistory.last["content"] = content;
       }
     });
@@ -89,9 +89,7 @@ class _HomepageState extends State<Homepage> {
           setSystemMessage('getting network info...');
           final networkInfo = await getDeviceNetworkInfo();
           advancedContext += networkInfo.toString();
-
-        }
-        else if (functionCallName == "getDeviceSpecs") {
+        } else if (functionCallName == "getDeviceSpecs") {
           setSystemMessage('getting device specs...');
           final deviceSpecs = await getDeviceSpecs();
           advancedContext += deviceSpecs;
@@ -124,20 +122,20 @@ class _HomepageState extends State<Homepage> {
         "$userInput CONTEXT: $context. CHAT-HISTORY: ${chatHistory.toString()}");
 
     final stream = chat.sendMessageStream(content);
-      String accumulatedResponse = '';
-      bool isFirstChuck = true;
-      await for (final response in stream) {
-        if (response.text != null && response.text!.isNotEmpty) {
-          accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
-          }
+    String accumulatedResponse = '';
+    bool isFirstChuck = true;
+    await for (final response in stream) {
+      if (response.text != null && response.text!.isNotEmpty) {
+        accumulatedResponse += response.text!;
+        if (isFirstChuck) {
+          gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          isFirstChuck = false;
+        } else {
+          gotResponseFromAI(accumulatedResponse, isFirstChuck);
         }
       }
-      animateChatHistoryToBottom();
+    }
+    animateChatHistoryToBottom();
   }
 
   void animateChatHistoryToBottom() {
@@ -196,11 +194,11 @@ class _HomepageState extends State<Homepage> {
       await for (final response in stream) {
         if (response.text != null && response.text!.isNotEmpty) {
           accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          if (isFirstChuck) {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
+            isFirstChuck = false;
+          } else {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
           }
         }
       }
@@ -223,11 +221,11 @@ class _HomepageState extends State<Homepage> {
       await for (final response in stream) {
         if (response.text != null && response.text!.isNotEmpty) {
           accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          if (isFirstChuck) {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
+            isFirstChuck = false;
+          } else {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
           }
         }
       }
@@ -517,15 +515,15 @@ class _HomepageState extends State<Homepage> {
       await for (final response in stream) {
         if (response.text != null && response.text!.isNotEmpty) {
           accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          if (isFirstChuck) {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
+            isFirstChuck = false;
+          } else {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
           }
         }
         if (response.functionCalls.isNotEmpty) {
-           await functionCallHandler(userInput, response.functionCalls);
+          await functionCallHandler(userInput, response.functionCalls);
         }
       }
       animateChatHistoryToBottom();
