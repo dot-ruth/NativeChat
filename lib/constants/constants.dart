@@ -4,6 +4,10 @@ final String googleAIStudioURL = "https://aistudio.google.com/app/apikey";
 final String github = "https://github.com/dagmawibabi/NativeChat";
 
 final List promptSuggestions = [
+  "What's the latest news",
+  "Show me some memes",
+  "What's the top post on r/AskReddit",
+  "What are some side projects being built?",
   "Get my network state and information",
   "Show me 3 beautiful math equations",
   "Show me my device's specs in table form",
@@ -304,6 +308,7 @@ final functionDeclarations = [
             "compsci",
             "cooking",
             "dadjokes",
+            "damnthatsinteresting",
             "dankmemes",
             "dataisbeautiful",
             "datascience",
@@ -329,6 +334,7 @@ final functionDeclarations = [
             "history",
             "howto",
             "humor",
+            "interesting",
             "IWantToLearn",
             "java",
             "javahelp",
@@ -345,6 +351,7 @@ final functionDeclarations = [
             "MathHelp",
             "math",
             "memes",
+            "mildlyinteresting",
             "MLQuestions",
             "movies",
             "music",
@@ -366,6 +373,7 @@ final functionDeclarations = [
             "reactjs",
             "regionalnews",
             "rust",
+            "satisfying",
             "science",
             "scala",
             "selfimprovement",
