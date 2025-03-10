@@ -58,7 +58,12 @@ Markdown & LaTeX Support:
 - For mathematical explanations, use standalone LaTeX documents or environments when needed.
 - When outputting LaTeX, use inline LaTeX syntax using '\$...\$' for formulas.
 - For mathematical expressions, use inline math (e.g., '\$x^2 + y^2 = z^2\$') rather than block math unless specifically requested.
-- Ensure clarity with LaTeX for inline mathematical explanations in all contexts.
+- Ensure clarity with LaTeX for inline mathematical explanations in all contexts. 
+
+Reddit Links
+- Format image and media link in markdown instead of just the URL. So it can be displayed properly. 
+- You can display media in markdown using the following syntax: ![Alt text](URL)
+- You can display images in markdown using the following syntax: ![Alt text](URL)
 
 Time & System Awareness:
 - You can access the current time and use it when relevant.
@@ -79,42 +84,6 @@ final functionDeclarations = [
     }),
   ),
 
-  //NETWORK STATE
-  FunctionDeclaration(
-    "getDeviceNetworkInfo",
-    "Retrieves the current network connection details of the device, including connection type, WiFi details, and network interface information.",
-    Schema.object(properties: {
-      'networkDetails': Schema.object(properties: {
-        'Network Connection Type': Schema.string(
-            description:
-                "The type of network connection (e.g., WiFi, Cellular, Ethernet)."),
-        'Is Connected': Schema.boolean(
-            description:
-                "Indicates whether the device is currently connected to a network."),
-        'WiFi Name': Schema.string(
-            description: "The SSID (name) of the connected WiFi network."),
-        'WiFi BSSID': Schema.string(
-            description:
-                "The BSSID (MAC address) of the connected WiFi network."),
-        'WiFi IP': Schema.string(
-            description:
-                "The IPv4 address assigned to the device on the WiFi network."),
-        'WiFi IPv6': Schema.string(
-            description:
-                "The IPv6 address assigned to the device on the WiFi network."),
-        'WiFi Submask': Schema.string(
-            description: "The subnet mask of the connected WiFi network."),
-        'WiFi Broadcast': Schema.string(
-            description:
-                "The broadcast address of the connected WiFi network."),
-        'WiFi Gateway': Schema.string(
-            description:
-                "The gateway (router) address of the connected WiFi network."),
-        'Network Interface': Schema.string(
-            description: "The name of the active network interface."),
-      }),
-    }),
-  ),
   // SPECS
   FunctionDeclaration(
     "getDeviceSpecs",
@@ -253,12 +222,182 @@ final functionDeclarations = [
     }),
   ),
 
+  //NETWORK STATE
+  FunctionDeclaration(
+    "getDeviceNetworkInfo",
+    "Retrieves the current network connection details of the device, including connection type, WiFi details, and network interface information.",
+    Schema.object(properties: {
+      'networkDetails': Schema.object(properties: {
+        'Network Connection Type': Schema.string(
+            description:
+                "The type of network connection (e.g., WiFi, Cellular, Ethernet)."),
+        'Is Connected': Schema.boolean(
+            description:
+                "Indicates whether the device is currently connected to a network."),
+        'WiFi Name': Schema.string(
+            description: "The SSID (name) of the connected WiFi network."),
+        'WiFi BSSID': Schema.string(
+            description:
+                "The BSSID (MAC address) of the connected WiFi network."),
+        'WiFi IP': Schema.string(
+            description:
+                "The IPv4 address assigned to the device on the WiFi network."),
+        'WiFi IPv6': Schema.string(
+            description:
+                "The IPv6 address assigned to the device on the WiFi network."),
+        'WiFi Submask': Schema.string(
+            description: "The subnet mask of the connected WiFi network."),
+        'WiFi Broadcast': Schema.string(
+            description:
+                "The broadcast address of the connected WiFi network."),
+        'WiFi Gateway': Schema.string(
+            description:
+                "The gateway (router) address of the connected WiFi network."),
+        'Network Interface': Schema.string(
+            description: "The name of the active network interface."),
+      }),
+    }),
+  ),
+
   // NO CONTEXT
   FunctionDeclaration(
     "clearConversation",
     'Clears the current conversation history.',
     Schema.object(
       properties: {'clear': Schema.string()},
+    ),
+  ),
+
+  // API Calls
+  FunctionDeclaration(
+    "getReddit",
+    "Fetches the top daily content from a specific subreddit.",
+    Schema.object(
+      properties: {
+        'subreddit': Schema.enumString(
+          enumValues: [
+            "Adventuretime",
+            "AskBiology",
+            "AskEngineers",
+            "AskHistorians",
+            "AskPhysics",
+            "AskReddit",
+            "AskRedditAfterDark",
+            "AskScience",
+            "askmath",
+            "askpsychology",
+            "Astronomy",
+            "Astronomy_Help",
+            "aws",
+            "basketball",
+            "beer",
+            "biology",
+            "biotech",
+            "books",
+            "business",
+            "changemyview",
+            "chemistry",
+            "chemhelp",
+            "cleanjokes",
+            "coding",
+            "computerscience",
+            "compsci",
+            "cooking",
+            "dadjokes",
+            "dankmemes",
+            "dataisbeautiful",
+            "datascience",
+            "dotnet",
+            "dotnetcore",
+            "economy",
+            "EducationalGIFs",
+            "elixir",
+            "emacs",
+            "entertainment",
+            "erlang",
+            "fitness",
+            "flutter",
+            "food",
+            "football",
+            "gadgets",
+            "gaming",
+            "groovy",
+            "hackernews",
+            "hacking",
+            "haskell",
+            "haskellquestions",
+            "history",
+            "howto",
+            "humor",
+            "IWantToLearn",
+            "java",
+            "javahelp",
+            "javascript",
+            "Jokes",
+            "learnjava",
+            "learnjavascript",
+            "learnprogramming",
+            "lifehacks",
+            "lisp",
+            "linux",
+            "localnews",
+            "machinelearning",
+            "MathHelp",
+            "math",
+            "memes",
+            "MLQuestions",
+            "movies",
+            "music",
+            "news",
+            "node",
+            "nostupidquestions",
+            "offmychest",
+            "oneliners",
+            "OpenEd",
+            "Physics",
+            "politics",
+            "productivity",
+            "ProgrammerHumor",
+            "ProgrammingLanguages",
+            "programming",
+            "psychology",
+            "puns",
+            "qualitynews",
+            "reactjs",
+            "regionalnews",
+            "rust",
+            "science",
+            "scala",
+            "selfimprovement",
+            "showerthoughts",
+            "SideProject",
+            "softwaredevelopment",
+            "solidity",
+            "sports",
+            "standupshots",
+            "statistics",
+            "technews",
+            "technology",
+            "tennis",
+            "todayilearned",
+            "travel",
+            "tvshows",
+            "weightlifting",
+            "webdev",
+            "worldnews",
+            "YouShouldKnow"
+          ],
+          description: "The subreddits to fetch content from.",
+        ),
+        'time': Schema.enumString(
+          enumValues: ["hour", "day", "week", "month", "year", "all"],
+          description: "The time range for fetching content.",
+        ),
+        'listing': Schema.enumString(
+          enumValues: ["new", "hot", "rising", "best", "random", "top"],
+          description: "The sorting for fetching content.",
+        ),
+      },
     ),
   )
 ];

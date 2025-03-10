@@ -14,6 +14,7 @@ import 'package:nativechat/components/input_box/input_box.dart';
 import 'package:nativechat/components/prompt_suggestions.dart';
 import 'package:nativechat/components/remarks.dart';
 import 'package:nativechat/constants/constants.dart';
+import 'package:nativechat/utils/api_calls.dart';
 import 'package:nativechat/utils/get_device_context.dart';
 import 'package:nativechat/utils/tts.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -110,6 +111,10 @@ class _HomepageState extends State<Homepage> {
           setSystemMessage('getting battery level and status...');
           final batteryInfo = await getDeviceBattery();
           advancedContext += batteryInfo;
+        } else if (functionCallName == "getReddit") {
+          setSystemMessage('reading reddit posts...');
+          final headlines = await getReddit(eachFunctionCall.args);
+          advancedContext += headlines;
         }
         await continueFromFunctionCall(userInput, advancedContext);
       }
