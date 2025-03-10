@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:nativechat/models/chat_session.dart';
 import 'package:nativechat/models/settings.dart';
 import 'package:theme_provider/theme_provider.dart';
 // import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(SettingsAdapter());
+  Hive.registerAdapter(ChatSessionModelAdapter());
   runApp(const MyApp());
 }
 
@@ -21,6 +23,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  ChatSessionModel? session;
   @override
   Widget build(BuildContext context) {
     var darkGreyColor = Color(0xff0a0a0a);
@@ -77,7 +80,7 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             initialRoute: "/",
             routes: {
-              "/": (context) => const Homepage(),
+              "/": (context) => Homepage(session: session),
             },
           ),
         ),
