@@ -27,7 +27,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
   void getSavedAPIKey() async {
     Box settingBox = await Hive.openBox("settings");
     apiKey = await settingBox.get("apikey") ?? "";
-    await Hive.close();
+    await settingBox.close();
     setState(() {});
   }
 
@@ -35,7 +35,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
     Box settingBox = await Hive.openBox("settings");
     await settingBox.put("apikey", apiKeyController.text.trim());
     apiKey = await settingBox.get("apikey") ?? "";
-    await Hive.close();
+    await settingBox.close();
     setState(() {
       apiKeyController.clear();
     });
@@ -47,7 +47,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
     Box settingBox = await Hive.openBox("settings");
     await settingBox.put("apikey", "");
     apiKey = await settingBox.get("apikey") ?? "";
-    await Hive.close();
+    await settingBox.close();
     setState(() {
       apiKeyController.clear();
     });

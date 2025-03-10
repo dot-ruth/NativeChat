@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:nativechat/components/apikey_input.dart';
 import 'package:nativechat/components/attachment_preview/attachment_preview.dart';
 import 'package:nativechat/components/chat_feed/conversation_feed.dart';
+import 'package:nativechat/components/chat_history_drawer.dart';
 import 'package:nativechat/components/home_appbar.dart';
 import 'package:nativechat/components/input_box/input_box.dart';
 import 'package:nativechat/components/prompt_suggestions.dart';
@@ -21,20 +22,25 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../components/attach_file_popup_menu/attach_file_popup_menu.dart';
+import 'package:nativechat/models/chat_session.dart';
 
+// ignore: must_be_immutable
 class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+  ChatSessionModel? session;
+  Homepage({super.key, this.session});
 
   @override
   State<Homepage> createState() => _HomepageState();
 }
 
 class _HomepageState extends State<Homepage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController userMessageController = TextEditingController();
   ScrollController scrollController = ScrollController();
 
   late GenerativeModel model;
-  var chatHistory = [];
+  late List chatHistory;
+  // ignore: unused_field
   bool _loading = false;
   var installedAppsString = '';
   var installedAppsLength = 0;
@@ -43,6 +49,19 @@ class _HomepageState extends State<Homepage> {
   Uint8List? attachedFileBytes;
   String? attachedMime;
   String? attachedFileName;
+  late Box<ChatSessionModel> chatBox;
+
+  Future<void> _openBox() async {
+    chatBox = await Hive.openBox<ChatSessionModel>("chat_session");
+  }
+
+  void _loadChat(ChatSessionModel selectedSession) {
+    setState(() {
+    chatHistory = List.from(selectedSession.messages);
+    widget.session = selectedSession;
+  });
+  }
+
   void addUserInputToChatHistory(userInput) {
     setState(() {
       chatHistory.add({
@@ -52,7 +71,7 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  void gotResponseFromAI(content, isNewMessage) {
+  void gotResponseFromAI(content, isNewMessage) async {
     if (isInVoiceMode) {
       speak(content);
     }
@@ -132,6 +151,8 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
+      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
+      widget.session?.save();
   }
 
   void animateChatHistoryToBottom() {
@@ -199,6 +220,8 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
+      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
+      widget.session?.save();
     } else if (sharedList != null &&
         sharedList!.isNotEmpty &&
         sharedList![0].value != null) {
@@ -226,6 +249,8 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
+      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
+      widget.session?.save();
     }
   }
 
@@ -246,6 +271,8 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       chatHistory = [];
     });
+    widget.session?.messages = [];
+    widget.session?.save();
   }
 
   dynamic isOneSidedChatMode = true;
@@ -257,7 +284,7 @@ class _HomepageState extends State<Homepage> {
       isOneSidedChatMode = !isOneSidedChatMode;
     });
     await settingBox.put("isOneSidedChatMode", isOneSidedChatMode);
-    Hive.close();
+    settingBox.close();
   }
 
   final SpeechToText speechToText = SpeechToText();
@@ -314,7 +341,7 @@ class _HomepageState extends State<Homepage> {
     setState(() {});
 
     // Close
-    await Hive.close();
+    await settingBox.close();
 
     // Model Initialization
     modelInitialization();
@@ -496,6 +523,18 @@ class _HomepageState extends State<Homepage> {
       chatHistory.add(message);
     });
 
+    if(widget.session == null){
+      Box box = await Hive.openBox<ChatSessionModel>("chat_session");
+      widget.session = ChatSessionModel(title: userInput, messages: [],createdAt: DateTime.now());
+      box.add(widget.session!);
+    }
+    
+    if(widget.session!.messages.isEmpty){
+      widget.session?.title = userInput;
+    }
+    widget.session?.messages.add(message);
+    widget.session?.save();
+
     // Clear any pending attachment state.
     removeAttachment();
     final List<Content> chatHistoryContent = chatHistory
@@ -523,6 +562,8 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
+      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
+      widget.session?.save();
     } catch (e) {
       setSystemMessage(e, isError: true);
       if (isInVoiceMode) {
@@ -659,6 +700,7 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     initializations();
+    _openBox();
   }
 
   @override
@@ -670,7 +712,19 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key:_scaffoldKey,
       appBar: HomeAppbar(
+        openDrawer: () {_scaffoldKey.currentState?.openDrawer();},
+        creatSession: () {
+          print("createSession");
+          setState(() {
+            _openBox();
+            final newSession = ChatSessionModel(title: "New Chat", messages: [],createdAt: DateTime.now());
+            chatBox.add(newSession);
+            widget.session = newSession;
+            chatHistory = List.from(newSession.messages);
+          });
+        },
         toggleAPIKey: () {
           setState(() {
             isAddingAPIKey = !isAddingAPIKey;
@@ -680,6 +734,8 @@ class _HomepageState extends State<Homepage> {
         isOneSidedChatMode: isOneSidedChatMode,
         clearConversation: clearConversation,
       ),
+      //Drawer 
+      drawer: ChatHistoryDrawer(onChatSelected: _loadChat),
       // Chat
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,

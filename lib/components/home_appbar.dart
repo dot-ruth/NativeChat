@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:theme_provider/theme_provider.dart';
@@ -5,12 +6,16 @@ import 'package:theme_provider/theme_provider.dart';
 class HomeAppbar extends StatefulWidget implements PreferredSizeWidget {
   const HomeAppbar({
     super.key,
+    required this.openDrawer,
+    required this.creatSession,
     required this.toggleAPIKey,
     required this.toggleOneSidedChatMode,
     required this.clearConversation,
     required this.isOneSidedChatMode,
   });
 
+  final VoidCallback openDrawer;
+  final VoidCallback creatSession;
   final VoidCallback toggleAPIKey;
   final VoidCallback toggleOneSidedChatMode;
   final VoidCallback clearConversation;
@@ -27,6 +32,27 @@ class _HomeAppbarState extends State<HomeAppbar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      leadingWidth: 100,
+      leading: Row(
+            children: [
+              IconButton(
+                onPressed: widget.openDrawer,
+                icon: Icon(
+                  Icons.history,
+                  size: 20.0,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+              ),
+            IconButton(
+              onPressed: widget.creatSession,
+              icon: Icon(
+              CupertinoIcons.add_circled,
+              size: 20.0,
+              color: Theme.of(context).iconTheme.color,
+              ),
+             ),
+           ],
+          ),
       actions: [
         // API Key
         IconButton(
