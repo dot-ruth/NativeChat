@@ -4,6 +4,7 @@ import "package:nativechat/components/chat_feed/circle_dot.dart";
 import "package:nativechat/components/chat_feed/codeblock.dart";
 import "package:nativechat/components/chat_feed/dashed_border_exracted.dart";
 import "package:theme_provider/theme_provider.dart";
+import "package:url_launcher/url_launcher.dart";
 
 class AIResponse extends StatefulWidget {
   const AIResponse({
@@ -56,6 +57,13 @@ class _AIResponseState extends State<AIResponse> {
                       : Colors.grey[400]),
               codeBuilder: (context, name, code, closed) =>
                   Codeblock(code: code, name: name),
+              onLinkTab: (url, title) async {
+                var parsedURL = Uri.parse(url);
+                await launchUrl(
+                  parsedURL,
+                  mode: LaunchMode.inAppBrowserView,
+                );
+              },
             ),
           ),
         ),
