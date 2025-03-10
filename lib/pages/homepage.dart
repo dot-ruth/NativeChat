@@ -14,7 +14,9 @@ import 'package:nativechat/components/home_appbar.dart';
 import 'package:nativechat/components/input_box/input_box.dart';
 import 'package:nativechat/components/prompt_suggestions.dart';
 import 'package:nativechat/components/remarks.dart';
-import 'package:nativechat/constants/constants.dart';
+import 'package:nativechat/constants/function_declarations.dart';
+import 'package:nativechat/constants/system_prompt.dart';
+import 'package:nativechat/utils/api_calls.dart';
 import 'package:nativechat/utils/get_device_context.dart';
 import 'package:nativechat/utils/tts.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -76,13 +78,13 @@ class _HomepageState extends State<Homepage> {
       speak(content);
     }
     setState(() {
-      if(isNewMessage){
+      if (isNewMessage) {
         chatHistory.add({
-        "from": "ai",
-        "content": content,
+          "from": "ai",
+          "content": content,
         });
-        chatHistory.removeAt(chatHistory.length -2);
-      }else{
+        chatHistory.removeAt(chatHistory.length - 2);
+      } else {
         chatHistory.last["content"] = content;
       }
     });
@@ -104,6 +106,10 @@ class _HomepageState extends State<Homepage> {
           setSystemMessage('getting device time...');
           final deviceTime = await getDeviceTime();
           advancedContext += deviceTime;
+        } else if (functionCallName == "getDeviceNetworkInfo") {
+          setSystemMessage('getting network info...');
+          final networkInfo = await getDeviceNetworkInfo();
+          advancedContext += networkInfo.toString();
         } else if (functionCallName == "getDeviceSpecs") {
           setSystemMessage('getting device specs...');
           final deviceSpecs = await getDeviceSpecs();
@@ -125,6 +131,10 @@ class _HomepageState extends State<Homepage> {
           setSystemMessage('getting battery level and status...');
           final batteryInfo = await getDeviceBattery();
           advancedContext += batteryInfo;
+        } else if (functionCallName == "getReddit") {
+          setSystemMessage('reading reddit posts...');
+          final headlines = await getReddit(eachFunctionCall.args);
+          advancedContext += headlines;
         }
         await continueFromFunctionCall(userInput, advancedContext);
       }
@@ -211,11 +221,11 @@ class _HomepageState extends State<Homepage> {
       await for (final response in stream) {
         if (response.text != null && response.text!.isNotEmpty) {
           accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          if (isFirstChuck) {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
+            isFirstChuck = false;
+          } else {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
           }
         }
       }
@@ -240,11 +250,11 @@ class _HomepageState extends State<Homepage> {
       await for (final response in stream) {
         if (response.text != null && response.text!.isNotEmpty) {
           accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          if (isFirstChuck) {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
+            isFirstChuck = false;
+          } else {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
           }
         }
       }
@@ -550,15 +560,15 @@ class _HomepageState extends State<Homepage> {
       await for (final response in stream) {
         if (response.text != null && response.text!.isNotEmpty) {
           accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          if (isFirstChuck) {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
+            isFirstChuck = false;
+          } else {
+            gotResponseFromAI(accumulatedResponse, isFirstChuck);
           }
         }
         if (response.functionCalls.isNotEmpty) {
-           await functionCallHandler(userInput, response.functionCalls);
+          await functionCallHandler(userInput, response.functionCalls);
         }
       }
       animateChatHistoryToBottom();

@@ -1,71 +1,5 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 
-final String googleAIStudioURL = "https://aistudio.google.com/app/apikey";
-final String github = "https://github.com/dagmawibabi/NativeChat";
-
-final List promptSuggestions = [
-  "Show me 3 beautiful math equations",
-  "Show me my device's specs in table form",
-  'Tell me my unread text messages?',
-  'How many cores does my phone have?',
-  'What is the longest call I had?',
-  'Is my phone charging?',
-  'Do I have any recent missed calls?',
-  'What is the sweetest text I got recently?',
-  'How many apps do I have?',
-  'Write code to find the Fibonacci sequence in Zig?',
-  "Write a Python script to check if a number is prime",
-  "Show me the latest quotes from famous philosophers",
-  "Generate a workout plan for a beginner",
-  "Tell me a fun fact about space exploration",
-  "How much storage is available on my device?",
-  "Generate a random inspirational quote",
-  "Write a JavaScript function to reverse a string",
-  "Give me a brief history of AI development",
-  "Show me the calorie count of a cheeseburger",
-  "CSS snippet to create a responsive navigation bar",
-  "Generate a to-do list with time slots for productivity.",
-  "Give me a summary of the apps I've installed recently",
-  "What was the total duration of all calls made today?",
-  "Tell me the time zone of my device",
-  "How many unread messages do I have?",
-  "Summarize my last 3 call in a table?",
-  "Give me a summary of my last 5 text messages",
-  "Let's play a game",
-];
-
-final String systemPrompt = '''
-You are an intelligent and proactive AI assistant on the user's phone. Your goal is to provide helpful, insightful, and dynamic responses to any query, whether through direct reasoning, code generation, using provided context or using available function calls.
-
-Core Directives:
-- Be Autonomous & Proactive - Do not overly rely on function calls. If the available functions do not cover the request, use logical deduction, generate a possible response, or write relevant code.
-- Coding Capabilities - You can write, analyze, and debug code in multiple languages without needing function calls. Always strive for correctness, best practices, and clarity- your code output.
-- Context Awareness - Utilize any contextual information given to you before considering function calls. Apply reasoning, infer logical responses, and provide creat- problem-solving.
-- Adaptive Communication - Explain your reasoning clearly when needed, be concise when appropriate, and adjust your tone based on the user's style and preference.
-- Fallback & Intelligent Guessing - If no function exists to complete a request, intelligently generate a likely response based on common sense, data patterns, or a well-reaso- assumption.
-- Decision-Making - If you believe a function call is necessary but unavailable, attempt to approximate the expected outcome through text or code rather than failing outright.
-- Multi-Modal Capability - You can write text, code, structured data (like JSON or Markdown), and explanations seamlessly without unnecessary dependencies.
-
-Function Call Usage:
-- Use function calls when beneficial, but do not depend on them exclusively.
-- If function calls lack necessary details, compensate by generating reasonable responses based on logic and prior knowledge.
-- Prioritize efficiency, combining multiple sources of context, logic, and available tools for the best possible answer.
-
-Markdown & LaTeX Support:
-- When outputting LaTeX, use pure LaTeX syntax without embedding it inside Markdown.
-- For Markdown responses, strictly use pure Markdown without LaTeX formatting.
-- For mathematical explanations, use standalone LaTeX documents or environments when needed.
-- When outputting LaTeX, use inline LaTeX syntax using '\$...\$' for formulas.
-- For mathematical expressions, use inline math (e.g., '\$x^2 + y^2 = z^2\$') rather than block math unless specifically requested.
-- Ensure clarity with LaTeX for inline mathematical explanations in all contexts.
-
-Time & System Awareness:
-- You can access the current time and use it when relevant.
-- Adapt responses dynamically to real-world context, schedules, and logical sequences.
-
-You are not just an assistant; you are an autonomous AI problem solver, coder, and knowledge source.
-''';
-
 final functionDeclarations = [
   // TIME
   FunctionDeclaration(
@@ -216,6 +150,43 @@ final functionDeclarations = [
     }),
   ),
 
+  //NETWORK STATE
+  FunctionDeclaration(
+    "getDeviceNetworkInfo",
+    "Retrieves the current network connection details of the device, including connection type, WiFi details, and network interface information.",
+    Schema.object(properties: {
+      'networkDetails': Schema.object(properties: {
+        'Network Connection Type': Schema.string(
+            description:
+                "The type of network connection (e.g., WiFi, Cellular, Ethernet)."),
+        'Is Connected': Schema.boolean(
+            description:
+                "Indicates whether the device is currently connected to a network."),
+        'WiFi Name': Schema.string(
+            description: "The SSID (name) of the connected WiFi network."),
+        'WiFi BSSID': Schema.string(
+            description:
+                "The BSSID (MAC address) of the connected WiFi network."),
+        'WiFi IP': Schema.string(
+            description:
+                "The IPv4 address assigned to the device on the WiFi network."),
+        'WiFi IPv6': Schema.string(
+            description:
+                "The IPv6 address assigned to the device on the WiFi network."),
+        'WiFi Submask': Schema.string(
+            description: "The subnet mask of the connected WiFi network."),
+        'WiFi Broadcast': Schema.string(
+            description:
+                "The broadcast address of the connected WiFi network."),
+        'WiFi Gateway': Schema.string(
+            description:
+                "The gateway (router) address of the connected WiFi network."),
+        'Network Interface': Schema.string(
+            description: "The name of the active network interface."),
+      }),
+    }),
+  ),
+
   // NO CONTEXT
   FunctionDeclaration(
     "clearConversation",
@@ -223,8 +194,143 @@ final functionDeclarations = [
     Schema.object(
       properties: {'clear': Schema.string()},
     ),
+  ),
+
+  // API Calls
+  FunctionDeclaration(
+    "getReddit",
+    "Fetches the top daily content from a relevant subreddit. If the user does not specify a subreddit, one will be chosen automatically based on the context.",
+    Schema.object(
+      properties: {
+        'subreddit': Schema.enumString(
+          enumValues: [
+            "Adventuretime",
+            "AskBiology",
+            "AskEngineers",
+            "AskHistorians",
+            "AskPhysics",
+            "AskReddit",
+            "AskRedditAfterDark",
+            "AskScience",
+            "askmath",
+            "askpsychology",
+            "Astronomy",
+            "Astronomy_Help",
+            "aws",
+            "basketball",
+            "beer",
+            "biology",
+            "biotech",
+            "books",
+            "business",
+            "changemyview",
+            "chemistry",
+            "chemhelp",
+            "cleanjokes",
+            "coding",
+            "computerscience",
+            "compsci",
+            "cooking",
+            "dadjokes",
+            "damnthatsinteresting",
+            "dankmemes",
+            "dataisbeautiful",
+            "datascience",
+            "dotnet",
+            "dotnetcore",
+            "economy",
+            "EducationalGIFs",
+            "elixir",
+            "emacs",
+            "entertainment",
+            "erlang",
+            "fitness",
+            "flutter",
+            "food",
+            "football",
+            "gadgets",
+            "gaming",
+            "groovy",
+            "hackernews",
+            "hacking",
+            "haskell",
+            "haskellquestions",
+            "history",
+            "howto",
+            "humor",
+            "interesting",
+            "IWantToLearn",
+            "java",
+            "javahelp",
+            "javascript",
+            "Jokes",
+            "learnjava",
+            "learnjavascript",
+            "learnprogramming",
+            "lifehacks",
+            "lisp",
+            "linux",
+            "localnews",
+            "machinelearning",
+            "MathHelp",
+            "math",
+            "memes",
+            "mildlyinteresting",
+            "MLQuestions",
+            "movies",
+            "music",
+            "news",
+            "node",
+            "nostupidquestions",
+            "offmychest",
+            "oneliners",
+            "OpenEd",
+            "Physics",
+            "politics",
+            "productivity",
+            "ProgrammerHumor",
+            "ProgrammingLanguages",
+            "programming",
+            "psychology",
+            "puns",
+            "qualitynews",
+            "reactjs",
+            "regionalnews",
+            "rust",
+            "satisfying",
+            "science",
+            "scala",
+            "selfimprovement",
+            "showerthoughts",
+            "SideProject",
+            "softwaredevelopment",
+            "solidity",
+            "sports",
+            "standupshots",
+            "statistics",
+            "technews",
+            "technology",
+            "tennis",
+            "todayilearned",
+            "travel",
+            "tvshows",
+            "weightlifting",
+            "webdev",
+            "worldnews",
+            "YouShouldKnow"
+          ],
+          description:
+              "The subreddit to fetch content from. If unspecified, an appropriate subreddit will be chosen automatically.",
+        ),
+        'time': Schema.enumString(
+          enumValues: ["hour", "day", "week", "month", "year", "all"],
+          description: "The time range for fetching content.",
+        ),
+        'listing': Schema.enumString(
+          enumValues: ["new", "hot", "rising", "best", "random", "top"],
+          description: "The sorting for fetching content.",
+        ),
+      },
+    ),
   )
 ];
-
-final String remarks =
-    "This uses Gemini 2.0 Flash from google with a 1 million token context window. You can get a free api key from their website which will be sufficient for most of your tasks. \n\nUsing the free tier lets Google access your conversation history and private information so if you'd like a private version consider switching to a paid tier";

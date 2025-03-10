@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nativechat/components/chat_feed/circle_dot.dart';
-import 'package:nativechat/constants/constants.dart';
+import 'package:nativechat/constants/prompt_suggestions.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 class PromptSuggestionsFeed extends StatefulWidget {
