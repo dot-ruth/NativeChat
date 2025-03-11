@@ -196,6 +196,34 @@ final functionDeclarations = [
     ),
   ),
 
+  // Dark Mode
+  FunctionDeclaration(
+    "toggleDarkMode",
+    'Turns darkmode on or off.',
+    Schema.object(
+      properties: {
+        'mode': Schema.enumString(
+          enumValues: ['dark', 'light', 'toggle'],
+          description:
+              "The theme mode to switch between. Choose toggle mode when unspecified.",
+        ),
+      },
+    ),
+  ),
+
+  // Toggle One Sided Mode
+  FunctionDeclaration(
+    "toggleOneSidedChatMode",
+    'Turns if the chat layout is one sided or in bubble format.',
+    Schema.object(
+      properties: {
+        'isOneSided': Schema.boolean(
+          description: "if the chat layout is one sided or in bubble format.",
+        ),
+      },
+    ),
+  ),
+
   // API Calls
   FunctionDeclaration(
     "getReddit",

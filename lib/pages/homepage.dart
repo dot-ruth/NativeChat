@@ -16,12 +16,14 @@ import 'package:nativechat/components/prompt_suggestions.dart';
 import 'package:nativechat/components/remarks.dart';
 import 'package:nativechat/constants/function_declarations.dart';
 import 'package:nativechat/constants/system_prompt.dart';
+import 'package:nativechat/state/is_one_sided_chat_mode_notifier.dart';
 import 'package:nativechat/utils/api_calls.dart';
 import 'package:nativechat/utils/get_device_context.dart';
 import 'package:nativechat/utils/tts.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 import '../components/attach_file_popup_menu/attach_file_popup_menu.dart';
 import 'package:nativechat/models/chat_session.dart';
@@ -89,7 +91,11 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  var appFunctions = ['clearConversation'];
+  var appFunctions = [
+    'clearConversation',
+    'toggleOneSidedChatMode',
+    'toggleDarkMode'
+  ];
 
   Future<void> functionCallHandler(userInput, functionCalls) async {
     var advancedContext = '';
@@ -99,6 +105,25 @@ class _HomepageState extends State<Homepage> {
       if (appFunctions.contains(functionCallName)) {
         if (functionCallName == 'clearConversation') {
           clearConversation();
+        } else if (functionCallName == 'toggleOneSidedChatMode') {
+          setSystemMessage('toggle one sided chat mode...');
+          var isOneSidedChatModeNotifier = IsOneSidedChatModeNotifier();
+          isOneSidedChatModeNotifier.toggle();
+          gotResponseFromAI('toggled one sided chat mode', true);
+        } else if (functionCallName == 'toggleDarkMode') {
+          if (eachFunctionCall.args['mode'] == 'dark') {
+            setSystemMessage('changing theme from light mode to dark mode...');
+            ThemeProvider.controllerOf(context).setTheme("dark_theme");
+            gotResponseFromAI('changed from light to dark mode', true);
+          } else if (eachFunctionCall.args['mode'] == 'light') {
+            setSystemMessage('changing theme from dark to light mode...');
+            ThemeProvider.controllerOf(context).setTheme("light_theme");
+            gotResponseFromAI('changed from dark to light mode', true);
+          } else {
+            setSystemMessage('changing theme...');
+            ThemeProvider.controllerOf(context).nextTheme();
+            gotResponseFromAI('finished toggling the theme', true);
+          }
         }
       } else {
         if (functionCallName == "getDeviceTime") {

@@ -14,6 +14,7 @@ Function Call Usage:
 - Use function calls when beneficial, but do not depend on them exclusively.
 - If function calls lack necessary details, compensate by generating reasonable responses based on logic and prior knowledge.
 - Prioritize efficiency, combining multiple sources of context, logic, and available tools for the best possible answer.
+- Always ensure you have responded with a completion message after every function calls 
 
 Markdown & LaTeX Support:
 - When outputting LaTeX, use pure LaTeX syntax without embedding it inside Markdown.

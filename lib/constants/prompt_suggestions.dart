@@ -1,4 +1,7 @@
 final List promptSuggestions = [
+  "Change the theme",
+  "Turn on dark mode",
+  "Toggle one sided chat mode",
   "What's the latest news",
   "Show me some memes",
   "What's the top post on r/AskReddit",
