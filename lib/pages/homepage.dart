@@ -159,6 +159,10 @@ class _HomepageState extends State<Homepage> {
           setSystemMessage('reading reddit posts...');
           final headlines = await getReddit(eachFunctionCall.args);
           advancedContext += headlines;
+        } else if (functionCallName == "getCurrentLocation") {
+          setSystemMessage('getting current location...');
+          final currentLocation = await getCurrentLocation();
+          advancedContext += currentLocation;
         }
         await continueFromFunctionCall(userInput, advancedContext);
       }
