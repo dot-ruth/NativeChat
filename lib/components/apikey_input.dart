@@ -70,17 +70,20 @@ class _APIKeyInputState extends State<APIKeyInput> {
         bottom: 16.0,
       ),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(
-                20.0,
-              ),
-              topRight: Radius.circular(
-                20.0,
-              )),
-          color: ThemeProvider.themeOf(context).id == "light_theme"
-              ? const Color(0xfff2f2f2)
-              : const Color(0xff1a1a1a)),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(
+            20.0,
+          ),
+          topRight: Radius.circular(
+            20.0,
+          ),
+        ),
+        color: ThemeProvider.themeOf(context).id == "light_theme"
+            ? const Color(0xfff2f2f2)
+            : const Color(0xff1a1a1a),
+      ),
       child: Column(
+        spacing: 18.0,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // InputBox
@@ -108,7 +111,7 @@ class _APIKeyInputState extends State<APIKeyInput> {
               ),
             ],
           ),
-          SizedBox(height: 18.0),
+
           // API Key Buttons
           Wrap(
             spacing: 5.0,
@@ -134,10 +137,11 @@ class _APIKeyInputState extends State<APIKeyInput> {
                     child: Text(
                       'Get API Key',
                       style: TextStyle(
-                          color:
-                              ThemeProvider.themeOf(context).id == "light_theme"
-                                  ? Colors.black
-                                  : Colors.white),
+                        color:
+                            ThemeProvider.themeOf(context).id == "light_theme"
+                                ? Colors.black
+                                : Colors.white,
+                      ),
                     )),
               ),
 
@@ -160,10 +164,11 @@ class _APIKeyInputState extends State<APIKeyInput> {
                     child: Text(
                       'Save API Key',
                       style: TextStyle(
-                          color:
-                              ThemeProvider.themeOf(context).id == "light_theme"
-                                  ? Colors.black
-                                  : Colors.white),
+                        color:
+                            ThemeProvider.themeOf(context).id == "light_theme"
+                                ? Colors.black
+                                : Colors.white,
+                      ),
                     )),
               ),
 
@@ -186,10 +191,11 @@ class _APIKeyInputState extends State<APIKeyInput> {
                     child: Text(
                       'Clear API Key',
                       style: TextStyle(
-                          color:
-                              ThemeProvider.themeOf(context).id == "light_theme"
-                                  ? Colors.black
-                                  : Colors.white),
+                        color:
+                            ThemeProvider.themeOf(context).id == "light_theme"
+                                ? Colors.black
+                                : Colors.white,
+                      ),
                     )),
               ),
             ],

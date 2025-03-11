@@ -42,7 +42,6 @@ class _HomepageState extends State<Homepage> {
 
   late GenerativeModel model;
   late List chatHistory;
-  // ignore: unused_field
   bool _loading = false;
   var installedAppsString = '';
   var installedAppsLength = 0;
@@ -59,9 +58,9 @@ class _HomepageState extends State<Homepage> {
 
   void _loadChat(ChatSessionModel selectedSession) {
     setState(() {
-    chatHistory = List.from(selectedSession.messages);
-    widget.session = selectedSession;
-  });
+      chatHistory = List.from(selectedSession.messages);
+      widget.session = selectedSession;
+    });
   }
 
   void addUserInputToChatHistory(userInput) {
@@ -147,22 +146,23 @@ class _HomepageState extends State<Homepage> {
         "$userInput CONTEXT: $context. CHAT-HISTORY: ${chatHistory.toString()}");
 
     final stream = chat.sendMessageStream(content);
-      String accumulatedResponse = '';
-      bool isFirstChuck = true;
-      await for (final response in stream) {
-        if (response.text != null && response.text!.isNotEmpty) {
-          accumulatedResponse += response.text!;
-          if(isFirstChuck){
-           gotResponseFromAI(accumulatedResponse,isFirstChuck); 
-           isFirstChuck = false;
-          }else{
-           gotResponseFromAI(accumulatedResponse, isFirstChuck);
-          }
+    String accumulatedResponse = '';
+    bool isFirstChuck = true;
+    await for (final response in stream) {
+      if (response.text != null && response.text!.isNotEmpty) {
+        accumulatedResponse += response.text!;
+        if (isFirstChuck) {
+          gotResponseFromAI(accumulatedResponse, isFirstChuck);
+          isFirstChuck = false;
+        } else {
+          gotResponseFromAI(accumulatedResponse, isFirstChuck);
         }
       }
-      animateChatHistoryToBottom();
-      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
-      widget.session?.save();
+    }
+    animateChatHistoryToBottom();
+    widget.session?.messages
+        .add({"from": "ai", "content": accumulatedResponse});
+    widget.session?.save();
   }
 
   void animateChatHistoryToBottom() {
@@ -230,7 +230,8 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
-      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
+      widget.session?.messages
+          .add({"from": "ai", "content": accumulatedResponse});
       widget.session?.save();
     } else if (sharedList != null &&
         sharedList!.isNotEmpty &&
@@ -259,7 +260,8 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
-      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
+      widget.session?.messages
+          .add({"from": "ai", "content": accumulatedResponse});
       widget.session?.save();
     }
   }
@@ -283,18 +285,6 @@ class _HomepageState extends State<Homepage> {
     });
     widget.session?.messages = [];
     widget.session?.save();
-  }
-
-  dynamic isOneSidedChatMode = true;
-  void toggleOneSidedChatMode() async {
-    Box settingBox = await Hive.openBox("settings");
-    isOneSidedChatMode = await settingBox.get("isOneSidedChatMode") ?? true;
-
-    setState(() {
-      isOneSidedChatMode = !isOneSidedChatMode;
-    });
-    await settingBox.put("isOneSidedChatMode", isOneSidedChatMode);
-    settingBox.close();
   }
 
   final SpeechToText speechToText = SpeechToText();
@@ -339,7 +329,6 @@ class _HomepageState extends State<Homepage> {
   Future<void> getSettings() async {
     // Is One Sided Chat Mode
     Box settingBox = await Hive.openBox("settings");
-    isOneSidedChatMode = await settingBox.get("isOneSidedChatMode") ?? true;
 
     // Get API Key
     apiKey = await settingBox.get("apikey") ?? "";
@@ -533,13 +522,14 @@ class _HomepageState extends State<Homepage> {
       chatHistory.add(message);
     });
 
-    if(widget.session == null){
+    if (widget.session == null) {
       Box box = await Hive.openBox<ChatSessionModel>("chat_session");
-      widget.session = ChatSessionModel(title: userInput, messages: [],createdAt: DateTime.now());
+      widget.session = ChatSessionModel(
+          title: userInput, messages: [], createdAt: DateTime.now());
       box.add(widget.session!);
     }
-    
-    if(widget.session!.messages.isEmpty){
+
+    if (widget.session!.messages.isEmpty) {
       widget.session?.title = userInput;
     }
     widget.session?.messages.add(message);
@@ -572,7 +562,8 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
-      widget.session?.messages.add({"from":"ai", "content":accumulatedResponse});
+      widget.session?.messages
+          .add({"from": "ai", "content": accumulatedResponse});
       widget.session?.save();
     } catch (e) {
       setSystemMessage(e, isError: true);
@@ -722,14 +713,16 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key:_scaffoldKey,
+      key: _scaffoldKey,
       appBar: HomeAppbar(
-        openDrawer: () {_scaffoldKey.currentState?.openDrawer();},
+        openDrawer: () {
+          _scaffoldKey.currentState?.openDrawer();
+        },
         creatSession: () {
-          print("createSession");
           setState(() {
             _openBox();
-            final newSession = ChatSessionModel(title: "New Chat", messages: [],createdAt: DateTime.now());
+            final newSession = ChatSessionModel(
+                title: "New Chat", messages: [], createdAt: DateTime.now());
             chatBox.add(newSession);
             widget.session = newSession;
             chatHistory = List.from(newSession.messages);
@@ -740,12 +733,12 @@ class _HomepageState extends State<Homepage> {
             isAddingAPIKey = !isAddingAPIKey;
           });
         },
-        toggleOneSidedChatMode: toggleOneSidedChatMode,
-        isOneSidedChatMode: isOneSidedChatMode,
         clearConversation: clearConversation,
       ),
-      //Drawer 
-      drawer: ChatHistoryDrawer(onChatSelected: _loadChat),
+      //Drawer
+      drawer: ChatHistoryDrawer(
+        onChatSelected: _loadChat,
+      ),
       // Chat
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -756,10 +749,8 @@ class _HomepageState extends State<Homepage> {
                   ? PromptSuggestionsFeed(
                       chatWithAI: chatWithAI,
                       userMessageController: userMessageController,
-                      isOneSidedChatMode: isOneSidedChatMode,
                     )
                   : ConversationFeed(
-                      isOneSidedChatMode: isOneSidedChatMode,
                       scrollController: scrollController,
                       chatHistory: chatHistory,
                     ),

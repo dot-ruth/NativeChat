@@ -66,6 +66,13 @@ class _MyAppState extends State<MyApp> {
             scaffoldBackgroundColor: darkGreyColor,
             appBarTheme: AppBarTheme(
               backgroundColor: darkGreyColor,
+              iconTheme: IconThemeData(
+                color: Colors.grey[500],
+              ),
+              titleTextStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 18.0,
+              ),
             ),
             iconTheme: IconThemeData(
               color: Colors.grey[500],
