@@ -8,12 +8,14 @@ class HomeAppbar extends StatefulWidget implements PreferredSizeWidget {
     required this.creatSession,
     required this.toggleAPIKey,
     required this.clearConversation,
+    required this.temporaryChat
   });
 
   final VoidCallback openDrawer;
   final VoidCallback creatSession;
   final VoidCallback toggleAPIKey;
   final VoidCallback clearConversation;
+  final VoidCallback temporaryChat;
 
   @override
   State<HomeAppbar> createState() => _HomeAppbarState();
@@ -55,6 +57,16 @@ class _HomeAppbarState extends State<HomeAppbar> {
           onPressed: widget.clearConversation,
           icon: Icon(
             Ionicons.trash_outline,
+            size: 18.0,
+            color: Theme.of(context).iconTheme.color,
+          ),
+        ),
+
+        // Temporary Chat
+        IconButton(
+          onPressed: widget.temporaryChat,
+          icon: Icon(
+            Icons.hourglass_empty_outlined,
             size: 18.0,
             color: Theme.of(context).iconTheme.color,
           ),
