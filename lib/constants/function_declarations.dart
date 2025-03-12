@@ -278,6 +278,7 @@ final functionDeclarations = [
             "football",
             "gadgets",
             "gaming",
+            "gardening",
             "groovy",
             "hackernews",
             "hacking",
@@ -362,9 +363,10 @@ final functionDeclarations = [
     ),
   ),
 
+  // LOCATION
   FunctionDeclaration(
     "getCurrentLocation",
-    "Gets the user's current location.",
+    "Gets the user's current location and address which includes latitude and longitude",
     Schema.object(
       properties: {
         'location': Schema.string(

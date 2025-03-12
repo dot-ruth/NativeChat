@@ -19,6 +19,7 @@ import 'package:nativechat/constants/system_prompt.dart';
 import 'package:nativechat/state/is_one_sided_chat_mode_notifier.dart';
 import 'package:nativechat/utils/api_calls.dart';
 import 'package:nativechat/utils/get_device_context.dart';
+import 'package:nativechat/utils/show_toast.dart';
 import 'package:nativechat/utils/tts.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -160,7 +161,7 @@ class _HomepageState extends State<Homepage> {
           final headlines = await getReddit(eachFunctionCall.args);
           advancedContext += headlines;
         } else if (functionCallName == "getCurrentLocation") {
-          setSystemMessage('getting current location...');
+          setSystemMessage('tracking your location...');
           final currentLocation = await getCurrentLocation();
           advancedContext += currentLocation;
         }
@@ -173,7 +174,6 @@ class _HomepageState extends State<Homepage> {
     final chat = model.startChat(history: []);
     final content = Content.text(
         "$userInput CONTEXT: $context. CHAT-HISTORY: ${chatHistory.toString()}");
-
     final stream = chat.sendMessageStream(content);
     String accumulatedResponse = '';
     bool isFirstChuck = true;
@@ -314,6 +314,7 @@ class _HomepageState extends State<Homepage> {
     });
     widget.session?.messages = [];
     widget.session?.save();
+    showToast(context, "Cleared Chat");
   }
 
   final SpeechToText speechToText = SpeechToText();

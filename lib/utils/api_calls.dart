@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+// Reddit
 Future<String> getReddit(parameters) async {
   var subreddit = parameters['subreddit'].toString().trim();
   var time = parameters['time'].toString().trim();
@@ -18,20 +21,22 @@ Future<String> getReddit(parameters) async {
   return advancedContext;
 }
 
+// OPEN STREET MAP
 Future<String> getCurrentLocation() async {
   await Permission.location.request();
-  
+
   Position position = await Geolocator.getCurrentPosition();
-  var lat = position.latitude;
-  var lon = position.longitude;
-  
+  var latitude = position.latitude;
+  var longitude = position.longitude;
+
   var baseURL =
-      "https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lon";
+      "https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude";
 
   var dio = Dio();
   var result = await dio.get(baseURL);
-  var address = result.data['display_name'];
+  dynamic address = result.data;
 
-  var advancedContext = "CURRENT LOCATION IS ${address}";
+  var advancedContext =
+      "BASED ON THE CURRENT LATITUDE AND LONGITUDE OF ($latitude,$longitude) YOUR ADDRESS IS ${jsonEncode(address)}. IF ADDRESS IS IDENTIFIED STATE THAT THE DATA WAS OBTAINED FROM [OPENSTREETMAP](openstreetmap.org/copyright)";
   return advancedContext;
 }
