@@ -79,7 +79,6 @@ class _CodeblockState extends State<Codeblock> {
       title: Text("Copied"),
       autoDismiss: true,
     );
-    print("cherry");
   }
 
   // dynamic activeThemes;

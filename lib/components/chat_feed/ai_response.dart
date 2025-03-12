@@ -1,4 +1,5 @@
-import "package:cherry_toast/cherry_toast.dart";
+// ignore_for_file: use_build_context_synchronously
+
 import "package:flutter/material.dart";
 import "package:gpt_markdown/gpt_markdown.dart";
 import "package:nativechat/components/chat_feed/circle_dot.dart";
