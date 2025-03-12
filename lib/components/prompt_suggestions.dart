@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nativechat/components/chat_feed/circle_dot.dart';
 import 'package:nativechat/constants/prompt_suggestions.dart';
-import 'package:nativechat/constants/remarks.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 import '../state/is_one_sided_chat_mode_notifier.dart';
@@ -11,12 +10,10 @@ class PromptSuggestionsFeed extends StatefulWidget {
     super.key,
     required this.chatWithAI,
     required this.userMessageController,
-    required this.isTemporaryChat
   });
 
   final Function chatWithAI;
   final TextEditingController userMessageController;
-  final bool isTemporaryChat;
 
   @override
   State<PromptSuggestionsFeed> createState() => _PromptSuggestionsFeedState();
@@ -44,41 +41,8 @@ class _PromptSuggestionsFeedState extends State<PromptSuggestionsFeed> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.isTemporaryChat 
-    ? 
-    Expanded(
+    return Expanded(
       child: Container(
-        padding: const EdgeInsets.only(
-          left: 10.0,
-          right: 10.0,
-          bottom: 30.0,
-        ),
-        child: ListView(
-          reverse: true,
-          children: [
-            Column(
-              spacing: 30.0,
-              children: [
-                Image.asset(
-                  'assets/logo/logoBorder.png',
-                  height: 80.0,
-                ),
-                Text(
-                  temporaryChatRemarks,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.grey[600]!,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    )
-    :
-     Expanded(
-      child:  Container(
         height: 100.0,
         alignment: Alignment.topLeft,
         padding: const EdgeInsets.only(
