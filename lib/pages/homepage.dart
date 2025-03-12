@@ -53,6 +53,7 @@ class _HomepageState extends State<Homepage> {
   String? attachedMime;
   String? attachedFileName;
   late Box<ChatSessionModel> chatBox;
+  bool isTemporaryChat = false;
 
   Future<void> _openBox() async {
     chatBox = await Hive.openBox<ChatSessionModel>("chat_session");
@@ -185,9 +186,11 @@ class _HomepageState extends State<Homepage> {
       }
     }
     animateChatHistoryToBottom();
-    widget.session?.messages
+    if (!isTemporaryChat) {
+      widget.session?.messages
         .add({"from": "ai", "content": accumulatedResponse});
-    widget.session?.save();
+      widget.session?.save();
+    }
   }
 
   void animateChatHistoryToBottom() {
@@ -255,9 +258,11 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
-      widget.session?.messages
+      if(!isTemporaryChat){
+        widget.session?.messages
           .add({"from": "ai", "content": accumulatedResponse});
-      widget.session?.save();
+        widget.session?.save();
+      }
     } else if (sharedList != null &&
         sharedList!.isNotEmpty &&
         sharedList![0].value != null) {
@@ -285,9 +290,11 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
-      widget.session?.messages
+      if(!isTemporaryChat){
+        widget.session?.messages
           .add({"from": "ai", "content": accumulatedResponse});
-      widget.session?.save();
+        widget.session?.save();
+      }
     }
   }
 
@@ -308,8 +315,10 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       chatHistory = [];
     });
-    widget.session?.messages = [];
-    widget.session?.save();
+    if(!isTemporaryChat){
+      widget.session?.messages = [];
+      widget.session?.save();
+    }
   }
 
   final SpeechToText speechToText = SpeechToText();
@@ -547,18 +556,23 @@ class _HomepageState extends State<Homepage> {
       chatHistory.add(message);
     });
 
-    if (widget.session == null) {
-      Box box = await Hive.openBox<ChatSessionModel>("chat_session");
-      widget.session = ChatSessionModel(
+    if(!isTemporaryChat){
+      if(widget.session == null ){
+        Box box = await Hive.openBox<ChatSessionModel>("chat_session");
+        widget.session = ChatSessionModel(
           title: userInput, messages: [], createdAt: DateTime.now());
-      box.add(widget.session!);
+        box.add(widget.session!);
+      }
+      if(!widget.session!.isInBox){
+        chatBox.add(widget.session!);
+      }
+      if (widget.session!.messages.isEmpty) {
+        widget.session?.title = userInput;
+      }
+      widget.session?.messages.add(message);
+      widget.session?.save();
     }
-
-    if (widget.session!.messages.isEmpty) {
-      widget.session?.title = userInput;
-    }
-    widget.session?.messages.add(message);
-    widget.session?.save();
+    
 
     // Clear any pending attachment state.
     removeAttachment();
@@ -587,9 +601,12 @@ class _HomepageState extends State<Homepage> {
         }
       }
       animateChatHistoryToBottom();
-      widget.session?.messages
+      if(!isTemporaryChat){
+        widget.session?.messages
           .add({"from": "ai", "content": accumulatedResponse});
-      widget.session?.save();
+         widget.session?.save();
+      }
+      
     } catch (e) {
       setSystemMessage(e, isError: true);
       if (isInVoiceMode) {
@@ -746,6 +763,7 @@ class _HomepageState extends State<Homepage> {
         creatSession: () {
           setState(() {
             _openBox();
+            isTemporaryChat = false;
             final newSession = ChatSessionModel(
                 title: "New Chat", messages: [], createdAt: DateTime.now());
             chatBox.add(newSession);
@@ -759,6 +777,15 @@ class _HomepageState extends State<Homepage> {
           });
         },
         clearConversation: clearConversation,
+        temporaryChat: () {
+          setState(() {
+           isTemporaryChat = true;
+           widget.session = ChatSessionModel(
+                  title: "", messages: [], createdAt: DateTime.now());
+           widget.session = null;
+           chatHistory = [];
+          });
+        },
       ),
       //Drawer
       drawer: ChatHistoryDrawer(
@@ -772,6 +799,7 @@ class _HomepageState extends State<Homepage> {
               ? Remarks()
               : chatHistory.isEmpty
                   ? PromptSuggestionsFeed(
+                      isTemporaryChat: isTemporaryChat,
                       chatWithAI: chatWithAI,
                       userMessageController: userMessageController,
                     )
