@@ -360,5 +360,17 @@ final functionDeclarations = [
         ),
       },
     ),
-  )
+  ),
+
+  FunctionDeclaration(
+    "getCurrentLocation",
+    "Gets the user's current location.",
+    Schema.object(
+      properties: {
+        'location': Schema.string(
+          description: "The current location.",
+        ),
+      },
+    ),
+  ),
 ];
