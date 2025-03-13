@@ -25,7 +25,7 @@ class _MemoriesBottomSheetHeaderState extends State<MemoriesBottomSheetHeader> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
+        // Add Memory Header
         Padding(
           padding: const EdgeInsets.only(
             left: 20.0,
@@ -99,13 +99,16 @@ class _MemoriesBottomSheetHeaderState extends State<MemoriesBottomSheetHeader> {
                 },
                 icon: Icon(
                   Icons.add,
+                  color: ThemeProvider.themeOf(context).id == "dark_theme"
+                      ? Colors.white
+                      : Colors.black,
                 ),
               )
             ],
           ),
         ),
 
-        // Header
+        // Memories Header
         Padding(
           padding: const EdgeInsets.only(
             left: 20.0,
