@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'package:hive_flutter/hive_flutter.dart';
 
 Future<String> forgetOneMemory(memory) async {
