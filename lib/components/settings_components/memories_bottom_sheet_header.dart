@@ -94,8 +94,10 @@ class _MemoriesBottomSheetHeaderState extends State<MemoriesBottomSheetHeader> {
               ),
               IconButton(
                 onPressed: () {
-                  widget.addMemory(memoryController.text);
-                  memoryController.clear();
+                  if (memoryController.text.toString().trim() != "") {
+                    widget.addMemory(memoryController.text);
+                    memoryController.clear();
+                  }
                 },
                 icon: Icon(
                   Icons.add,
