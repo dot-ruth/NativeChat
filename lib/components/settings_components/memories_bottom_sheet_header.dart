@@ -29,7 +29,7 @@ class _MemoriesBottomSheetHeaderState extends State<MemoriesBottomSheetHeader> {
         Padding(
           padding: const EdgeInsets.only(
             left: 20.0,
-            top: 10.0,
+            top: 15.0,
             bottom: 10.0,
           ),
           child: Text(
@@ -86,7 +86,7 @@ class _MemoriesBottomSheetHeaderState extends State<MemoriesBottomSheetHeader> {
                       filled: true,
                       fillColor:
                           ThemeProvider.themeOf(context).id == "light_theme"
-                              ? const Color(0xfff2f2f2)
+                              ? const Color(0xffe0e0e0)
                               : const Color(0xff1a1a1a),
                     ),
                   ),

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
@@ -141,9 +143,11 @@ class _HomepageState extends State<Homepage> {
                 "YOU SAVED THIS INFORMATION TO MEMORY: ${eachFunctionCall.args['newMemory']}";
             await continueFromFunctionCall(userInput, advancedContext);
           }
+          showToast(context, "Memory Updated");
         } else if (functionCallName == "forgetMemories") {
           await forgetMemory();
           gotResponseFromAI('forgotten everything!', true);
+          showToast(context, "Memory Updated");
         } else if (functionCallName == "getMemories") {
           var oldMemories = await getMemories();
           if (oldMemories.isEmpty) {
