@@ -28,6 +28,7 @@ class _SendInputButtonState extends State<SendInputButton> {
       },
       icon: Icon(
         Ionicons.paper_plane_outline,
+        size: 22.0,
         color: Theme.of(context).iconTheme.color,
       ),
     );

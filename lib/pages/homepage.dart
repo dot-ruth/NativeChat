@@ -13,7 +13,7 @@ import 'package:nativechat/ai/function_calls/ai_memory/get_memories.dart';
 import 'package:nativechat/components/apikey_input.dart';
 import 'package:nativechat/components/attachment_preview/attachment_preview.dart';
 import 'package:nativechat/components/chat_feed/conversation_feed.dart';
-import 'package:nativechat/components/chat_history_drawer.dart';
+import 'package:nativechat/components/chat_history_drawer/chat_history_drawer.dart';
 import 'package:nativechat/components/home_appbar.dart';
 import 'package:nativechat/components/input_box/input_box.dart';
 import 'package:nativechat/components/prompt_suggestions.dart';

@@ -212,6 +212,11 @@ class _CodeblockState extends State<Codeblock> {
               maxHeight: _collapse ? 150.0 : double.infinity,
             ),
             decoration: BoxDecoration(
+              color: isLight == true
+                  ? _lightThemes[currentLightThemeIndex]['theme']['root']
+                      .backgroundColor
+                  : _darkThemes[currentDarkThemeIndex]['theme']['root']
+                      .backgroundColor,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(10.0),
                 bottomRight: Radius.circular(10.0),

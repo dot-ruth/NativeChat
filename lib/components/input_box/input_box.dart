@@ -96,17 +96,22 @@ class _InputBoxState extends State<InputBox> {
                 ),
               ),
               // Send and Mic Button
-              widget.isInVoiceMode
-                  ? InputMicButton(
-                      speechToText: widget.speechToText,
-                      startListening: widget.startListening,
-                      stopListening: widget.stopListening,
-                    )
-                  : SendInputButton(
-                      isSummarizeInContext: widget.isSummarizeInContext,
-                      summarizeText: widget.summarizeText,
-                      chatWithAI: widget.chatWithAI,
-                    )
+              Row(
+                children: [
+                  widget.isInVoiceMode
+                      ? InputMicButton(
+                          speechToText: widget.speechToText,
+                          startListening: widget.startListening,
+                          stopListening: widget.stopListening,
+                        )
+                      : Container(),
+                  SendInputButton(
+                    isSummarizeInContext: widget.isSummarizeInContext,
+                    summarizeText: widget.summarizeText,
+                    chatWithAI: widget.chatWithAI,
+                  ),
+                ],
+              ),
             ],
           ),
         ],

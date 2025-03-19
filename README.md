@@ -41,6 +41,10 @@ NativeChat is a powerful application designed to bring seamless, context-aware i
 -   **Clear Conversation** (clearConversation):
     -   Clears the current conversation history.
 
+## Illustrations
+
+![](./assets/promos/NativeChat1.png)
+
 ## Contributing
 
 We welcome contributions to improve NativeChat! Here's how you can help:

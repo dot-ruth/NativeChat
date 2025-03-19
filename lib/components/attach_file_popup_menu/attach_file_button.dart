@@ -13,7 +13,7 @@ class _AttachFileButtonState extends State<AttachFileButton> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(
-        8.0,
+        7.0,
       ),
       decoration: BoxDecoration(
         border: Border.all(
@@ -27,14 +27,8 @@ class _AttachFileButtonState extends State<AttachFileButton> {
           Icon(
             Ionicons.folder_open_outline,
             color: Theme.of(context).iconTheme.color,
-            size: 18.0,
+            size: 21.0,
           ),
-          // Text(
-          //   'Attach File',
-          //   style: TextStyle(
-          //     color: Theme.of(context).iconTheme.color,
-          //   ),
-          // ),
         ],
       ),
     );
