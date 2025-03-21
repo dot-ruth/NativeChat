@@ -54,6 +54,7 @@ class _ChatHistoryDrawerState extends State<ChatHistoryDrawer> {
               });
             },
           ),
+
           // History List
           Expanded(
             child: ValueListenableBuilder(
@@ -68,7 +69,7 @@ class _ChatHistoryDrawerState extends State<ChatHistoryDrawer> {
                   );
                 }
                 List<ChatSessionModel> sessions =
-                chatBox!.values.toList().reversed.toList();
+                    chatBox!.values.toList().reversed.toList();
                 // Filter sessions by search query
                 if (_searchQuery.isNotEmpty) {
                   sessions = sessions.where((session) {
@@ -78,13 +79,14 @@ class _ChatHistoryDrawerState extends State<ChatHistoryDrawer> {
                 return sessions.isEmpty
                     ? NoChatHistory()
                     : EachChatHistory(
-                  sessions: sessions,
-                  chatBox: chatBox,
-                  onChatSelected: widget.onChatSelected,
-                );
+                        sessions: sessions,
+                        chatBox: chatBox,
+                        onChatSelected: widget.onChatSelected,
+                      );
               },
             ),
           ),
+
           // Delete All Chats and Settings Footer
           ChatHistoryDrawerFooter(chatBox: chatBox),
         ],

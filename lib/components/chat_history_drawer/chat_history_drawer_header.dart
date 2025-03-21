@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:nativechat/components/chat_history_drawer/search_chat_history.dart';
 import 'package:nativechat/models/chat_session.dart';
 import 'package:theme_provider/theme_provider.dart';
 
@@ -21,7 +22,7 @@ class ChatHistoryDrawerHeader extends StatefulWidget {
 }
 
 class _ChatHistoryDrawerHeaderState extends State<ChatHistoryDrawerHeader> {
-  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
   ChatSessionModel createSession() {
     final newSession = ChatSessionModel(
@@ -35,7 +36,7 @@ class _ChatHistoryDrawerHeaderState extends State<ChatHistoryDrawerHeader> {
 
   @override
   void dispose() {
-    _searchController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
@@ -45,7 +46,6 @@ class _ChatHistoryDrawerHeaderState extends State<ChatHistoryDrawerHeader> {
     return Container(
       padding: const EdgeInsets.only(
         top: 45.0,
-        left: 15.0,
         right: 5.0,
       ),
       child: Column(
@@ -54,11 +54,14 @@ class _ChatHistoryDrawerHeaderState extends State<ChatHistoryDrawerHeader> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Chats',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: isLightTheme ? Colors.black : Colors.white,
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Text(
+                  'Chats',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: isLightTheme ? Colors.black : Colors.white,
+                  ),
                 ),
               ),
               IconButton(
@@ -75,27 +78,11 @@ class _ChatHistoryDrawerHeaderState extends State<ChatHistoryDrawerHeader> {
             ],
           ),
           const SizedBox(height: 10.0),
+
           // Search field
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: "Search chats",
-              prefixIcon: Icon(
-                Icons.search,
-                color: isLightTheme ? Colors.grey[600] : Colors.grey[400],
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: isLightTheme ? Colors.grey[200] : Colors.grey[800],
-            ),
-            style: TextStyle(
-              color: isLightTheme ? Colors.black : Colors.white,
-            ),
-            onChanged: widget.onSearchChanged,
+          SearchChatHistory(
+            searchController: searchController,
+            onSearchChanged: widget.onSearchChanged,
           ),
         ],
       ),

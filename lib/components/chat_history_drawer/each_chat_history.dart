@@ -54,16 +54,16 @@ class _EachChatHistoryState extends State<EachChatHistory> {
         return Container(
           decoration: BoxDecoration(
             border: Border(
-              top: index == 0
-                  ? BorderSide(
-                      color: ThemeProvider.themeOf(context).id == "light_theme"
-                          ? Colors.grey[300]!
-                          : Colors.grey[800]!,
-                      width: 0.3,
-                    )
-                  : BorderSide(
-                      color: Colors.transparent,
-                    ),
+              // top: index == 0
+              //     ? BorderSide(
+              //         color: ThemeProvider.themeOf(context).id == "light_theme"
+              //             ? Colors.grey[300]!
+              //             : Colors.grey[800]!,
+              //         width: 0.3,
+              //       )
+              //     : BorderSide(
+              //         color: Colors.transparent,
+              //       ),
               bottom: BorderSide(
                 color: ThemeProvider.themeOf(context).id == "light_theme"
                     ? Colors.grey[300]!
