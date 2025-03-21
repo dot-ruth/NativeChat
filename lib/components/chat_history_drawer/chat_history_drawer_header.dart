@@ -80,10 +80,12 @@ class _ChatHistoryDrawerHeaderState extends State<ChatHistoryDrawerHeader> {
           const SizedBox(height: 10.0),
 
           // Search field
-          SearchChatHistory(
-            searchController: searchController,
-            onSearchChanged: widget.onSearchChanged,
-          ),
+          widget.chatBox == null || widget.chatBox!.isEmpty
+              ? Container()
+              : SearchChatHistory(
+                  searchController: searchController,
+                  onSearchChanged: widget.onSearchChanged,
+                ),
         ],
       ),
     );
