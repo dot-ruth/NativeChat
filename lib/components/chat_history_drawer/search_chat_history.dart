@@ -18,7 +18,7 @@ class _SearchChatHistoryState extends State<SearchChatHistory> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 5.0),
+      padding: const EdgeInsets.only(left: 5.0, bottom: 20.0),
       child: TextField(
         controller: widget.searchController,
         onChanged: widget.onSearchChanged,

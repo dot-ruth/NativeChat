@@ -19,15 +19,22 @@ import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 import 'package:hive/hive.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:nativechat/pages/full_screen_code.dart';
 import 'package:theme_provider/theme_provider.dart';
 
 import '../../utils/copy_to_clipboard.dart';
 
 class Codeblock extends StatefulWidget {
-  const Codeblock({super.key, required this.code, required this.name});
+  Codeblock({
+    super.key,
+    required this.code,
+    required this.name,
+    this.isFullscreen = false,
+  });
 
   final String code;
   final String name;
+  bool isFullscreen;
 
   @override
   State<Codeblock> createState() => _CodeblockState();
@@ -147,17 +154,49 @@ class _CodeblockState extends State<Codeblock> {
               ),
             ),
             padding: const EdgeInsets.only(
-              left: 14.0,
+              left: 5.0,
               right: 10.0,
               top: 6.0,
               bottom: 6.0,
             ),
             child: Row(
               children: [
-                Text(
-                  widget.name,
-                  style: TextStyle(
-                    color: isLight ? Colors.black : Colors.grey[700],
+                GestureDetector(
+                  onTap: () => {
+                    widget.isFullscreen
+                        ? Navigator.pop(context)
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) {
+                                return FullScreenCode(
+                                  code: widget.code,
+                                  name: widget.name,
+                                );
+                              },
+                            ),
+                          )
+                  },
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Icon(
+                          widget.isFullscreen
+                              ? Icons.fullscreen_exit_outlined
+                              : Icons.fullscreen_outlined,
+                          size: 18.0,
+                          color: isLight ? Colors.grey[700] : Colors.grey[500],
+                        ),
+                      ),
+                      const SizedBox(width: 2.0),
+                      Text(
+                        widget.name,
+                        style: TextStyle(
+                          color: isLight ? Colors.black : Colors.grey[400],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const Spacer(),
@@ -247,21 +286,24 @@ class _CodeblockState extends State<Codeblock> {
               horizontal: 8.0,
               vertical: 1.0,
             ),
-            child: Row(
-              spacing: 4.0,
-              children: [
-                Icon(
-                  Ionicons.color_palette_outline,
-                  size: 14,
-                  color: isLight ? Colors.grey[700] : Colors.grey[500],
-                ),
-                Text(
-                  isLight == true
-                      ? _lightThemes[currentLightThemeIndex]['name']
-                      : _darkThemes[currentDarkThemeIndex]['name'],
-                  style: TextStyle(color: Theme.of(context).iconTheme.color),
-                ),
-              ],
+            child: GestureDetector(
+              onTap: () => {changeTheme()},
+              child: Row(
+                spacing: 4.0,
+                children: [
+                  Icon(
+                    Ionicons.color_palette_outline,
+                    size: 14,
+                    color: isLight ? Colors.grey[700] : Colors.grey[500],
+                  ),
+                  Text(
+                    isLight == true
+                        ? _lightThemes[currentLightThemeIndex]['name']
+                        : _darkThemes[currentDarkThemeIndex]['name'],
+                    style: TextStyle(color: Theme.of(context).iconTheme.color),
+                  ),
+                ],
+              ),
             ),
           )
         ],
